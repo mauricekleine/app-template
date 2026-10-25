@@ -2,5 +2,9 @@
   "template": "mauricekleine/app-template",
   "template_sha": null,
   "target": "soliton",
-  "name": "app-template"
+  "name": "app-template",
+  "soliton": {
+    "port": 3000,
+    "smoke_port": 3001
+  }
 }
