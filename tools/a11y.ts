@@ -33,7 +33,11 @@ try {
         );
       }
       const result = await new AxeBuilder({ page }).analyze();
-      if (result.violations.length) throw new Error(`${mode}: ${JSON.stringify(result.violations, null, 2)}`);
+      const findings = [
+        ...result.violations,
+        ...result.incomplete.filter((finding) => finding.id === "color-contrast"),
+      ];
+      if (findings.length) throw new Error(`${mode}: ${JSON.stringify(findings, null, 2)}`);
       console.log(`${mode}: axe found 0 violations`);
     }
     await page.setViewportSize({ width: 390, height: 844 });

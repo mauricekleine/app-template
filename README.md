@@ -106,7 +106,7 @@ bunx playwright install --with-deps chromium
 bun run test:a11y
 ```
 
-On Soliton, wrap blocking commands in `~/.local/bin/hyperspeed-run --`. The HTTP tests start the real production server on an ephemeral loopback port and stop only their own process. They cover health, build identity, page and 404 rendering, cache policy, and the verifier's exact-match and stale-build outcomes. The browser check runs axe on the first page in void and paper and checks mobile 404 recovery and browser diagnostics.
+On Soliton, wrap blocking commands in `~/.local/bin/hyperspeed-run --`. The HTTP tests start the real production server on an ephemeral loopback port and stop only their own process. They cover health, build identity, page and 404 rendering, cache policy, and the verifier's exact-match and stale-build outcomes. The browser check runs axe on the first page in void and paper, failing on violations and unresolved contrast findings. It checks mobile 404 recovery and browser diagnostics too. Chromium's expected network console message for the unknown document's HTTP 404 is the only allowed diagnostic; missing assets, JavaScript errors and hydration warnings still fail.
 
 `.github/workflows/ci.yml` runs only on GitHub-hosted Ubuntu. Its required check name is **`template-ci`**. `.github/workflows/registry-canary.yml` runs daily at **05:17 UTC** and on manual dispatch, reinstalling live `@mk` items before building and testing both targets and running the same browser check. Its check name is **`registry-canary`**. A failed scheduled job is a visible failed Actions run; GitHub's workflow notification settings deliver it to subscribers.
 
