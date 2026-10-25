@@ -1,17 +1,19 @@
-# Replace APP_NAME, APP_DIR, BUN_PATH and PORT. Install as APP_NAME.service.
+# App-owned: replace APP_NAME and PORT_NUMBER, install as APP_NAME.service.
+# src/serve.ts pins hostname to 127.0.0.1 independently of environment variables.
 [Unit]
-Description=APP_NAME
-After=network.target
+Description=APP_NAME TanStack Start on Bun
+After=network-online.target
 
 [Service]
 Type=simple
-WorkingDirectory=APP_DIR
+WorkingDirectory=%h/.local/share/start-app/APP_NAME/current
 Environment=NODE_ENV=production
 Environment=PORT=PORT_NUMBER
-ExecStart=BUN_PATH run start
+ExecStart=%h/.local/share/start-app/APP_NAME/current/bun --smol src/serve.ts
 Restart=on-failure
-RestartSec=3
-KillSignal=SIGTERM
+RestartSec=3s
+TimeoutStopSec=1s
+UMask=0077
 
 [Install]
 WantedBy=default.target

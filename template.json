@@ -14,6 +14,7 @@
     "components.json",
     "infra/soliton/Caddyfile",
     "infra/soliton/app.service",
+    "infra/soliton/deploy.sh",
     "public/_headers",
     "src/components/superthread/hooks/use-mobile.ts",
     "src/components/superthread/lib/fleet.ts",

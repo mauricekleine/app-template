@@ -1,4 +1,9 @@
-# Replace APP_HOST and PORT_NUMBER. The Bun listener is loopback only.
+# The upstream an app's vhost proxies to. Access control lives in the vhost file Soliton installs
+# (infra/soliton/caddy/<app>.caddy in mauricekleine/soliton, which restricts to the tailnet); copy only
+# this reverse_proxy block into it and keep that file's matcher.
 APP_HOST {
-    reverse_proxy 127.0.0.1:PORT_NUMBER
+    reverse_proxy 127.0.0.1:PORT_NUMBER {
+        # Deliver quiet SSE promptly; leave stream lifetime unbounded.
+        flush_interval -1
+    }
 }

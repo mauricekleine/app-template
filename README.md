@@ -37,7 +37,7 @@ The rail ships without private hostnames. The template links only its public sup
 
 Streaming routes belong under `/api/streams/`. The mount calls `server.timeout(request, 0)` before passing each such request to Start, so Bun's default ten-second idle timeout cannot close a quiet stream or a request waiting for its first event. When adding a stream at another path, add that path to the mount's timeout rule. The server stops on SIGTERM or SIGINT.
 
-`infra/soliton/app.service` and `infra/soliton/Caddyfile` are templates only. Replace every uppercase placeholder, build the app, and arrange the service and proxy in the hosting repository. They are not installed by any script here. This repository includes no secret template, release switch or rollback tool.
+On Soliton an app deploys with `bash infra/soliton/deploy.sh <commit>`, and `--rollback` swaps back to the previous release. It reads the app's name and ports from `.mk/app.json` and runs Soliton's release command ([runbook](https://github.com/mauricekleine/soliton/blob/main/docs/runbooks/start-on-bun.md)): build the commit into its own release, smoke-test it on the spare port, switch `current`, restart the user unit and check the SHA. Only `current` and `previous` are kept. `infra/soliton/app.service` and `infra/soliton/Caddyfile` are install-time templates: replace `APP_NAME`, `PORT_NUMBER` and `APP_HOST`, install the unit once as a user unit, and copy the `reverse_proxy` block into the app's vhost in soliton, which owns access control. A migration keeps its app's existing unit name, port and vhost.
 
 `bun run build:cloudflare` writes cf's prebuilt output to `.cloudflare/output/v0/`, independently of `dist/`. `cloudflare.config.ts` names the Worker, Start entry and asset behavior. Personalize it before arranging hosting. Neither build deploys; this repository has no deploy workflow or configured live hostname. The Worker's `/healthz` and `/api/deploy.json` run through the same server entry as Soliton.
 
@@ -80,11 +80,12 @@ The app stamp is:
   "template": "mauricekleine/app-template",
   "template_sha": null,
   "target": "soliton",
-  "name": "app-template"
+  "name": "app-template",
+  "soliton": { "port": 3000, "smoke_port": 3001 }
 }
 ```
 
-In this source template only, `template_sha: null` means "this checkout is the template itself". A source cannot embed its own future commit hash. Creation must replace it with the full template commit used to create the app. In an app it is a required full 40-character SHA: the last successfully applied template revision, never the app's HEAD or its deploy SHA. `target` is `soliton` or `cloudflare`; `name` is the app's name. Creation replaces both. Sync preserves the app's target and name.
+In this source template only, `template_sha: null` means "this checkout is the template itself". A source cannot embed its own future commit hash. Creation must replace it with the full template commit used to create the app. In an app it is a required full 40-character SHA: the last successfully applied template revision, never the app's HEAD or its deploy SHA. `target` is `soliton` or `cloudflare`; `name` is the app's name. `soliton` holds the live and smoke ports for the Soliton target; Cloudflare apps omit it. Creation sets all of these, and sync preserves them.
 
 For a sync from base `template_sha` to a selected template commit:
 
