@@ -18,6 +18,16 @@ test("a prerendered page's policy goes first in head and names each inline scrip
   expect(html.replace(/<meta http-equiv[^>]+>/, "")).toBe(page);
 });
 
+test("element directives, which override script-src and style-src, get the hashes too", () => {
+  const page = `<html><head><script>${theme}</script><style>${theme}</style></head></html>`;
+  const policy = withPolicy(page, "script-src 'self'; script-src-elem 'self'; style-src-elem 'none'").match(
+    /content="([^"]+)"/,
+  )?.[1];
+  expect(policy).toBe(
+    `script-src 'self' ${themeHash}; script-src-elem 'self' ${themeHash}; style-src-elem ${themeHash}`,
+  );
+});
+
 test("a policy that cannot cover the page's inline code fails the build", () => {
   expect(() => withPolicy(`<html><head><script>${theme}</script></head></html>`, "default-src 'self'")).toThrow(
     "script-src",

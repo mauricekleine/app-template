@@ -66,16 +66,20 @@ export function withPolicy(html: string, csp: string) {
     const [name, ...values] = directive.trim().split(/\s+/);
     if (name) directives.set(name.toLowerCase(), values);
   }
-  const extend = (name: string, hashes: string[], prefix: string[] = []) => {
+  // An -elem or -attr directive overrides its general one for that kind of code, so every declared one gets the hashes.
+  const extend = (names: string[], hashes: string[], prefix: string[] = []) => {
     if (!hashes.length) return;
-    const values = directives.get(name);
-    if (!values) throw new Error(`the policy needs a ${name} directive for this page's inline code`);
-    directives.set(name, [...new Set([...values.filter((value) => value !== "'none'"), ...prefix, ...hashes])]);
+    const declared = names.filter((name) => directives.has(name));
+    if (!declared.length) throw new Error(`the policy needs a ${names.at(-1)} directive for this page's inline code`);
+    for (const name of declared) {
+      const values = directives.get(name) ?? [];
+      directives.set(name, [...new Set([...values.filter((value) => value !== "'none'"), ...prefix, ...hashes])]);
+    }
   };
-  extend("script-src", scripts);
-  extend("style-src", styles);
+  extend(["script-src-elem", "script-src"], scripts);
+  extend(["style-src-elem", "style-src"], styles);
   if (attributes.length && !directives.has("style-src-attr")) directives.set("style-src-attr", []);
-  extend("style-src-attr", attributes, ["'unsafe-hashes'"]);
+  extend(["style-src-attr"], attributes, ["'unsafe-hashes'"]);
 
   const policy = [...directives].map(([name, values]) => [name, ...values].join(" ")).join("; ");
   if (/["<>&]/.test(policy)) throw new Error("the policy must not contain quotes, angle brackets or ampersands");
