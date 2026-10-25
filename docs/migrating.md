@@ -15,7 +15,7 @@ mk apps create <name> --target soliton --port <live port>
 
 If an older repository already has the name, rename it first (quanta's became `quanta-archive`). GitHub keeps answering the old name with a redirect; create treats a redirect as a free name. If the live app keeps state under `~/projects/<name>`, run create with `MK_APPS_ROOT` pointing at another directory, so its bootstrap worktree doesn't collide with the live data. The checkout moves into place at cut-over.
 
-To adopt the template in place instead (orbit): copy the owned files from `template.json` at one template commit, write `.mk/app.json` with that `template_sha`, and check with `mk apps sync --check <path>`.
+To adopt the template in place instead (orbit): copy the owned files that fit the app from `template.json` at one template commit, write `.mk/app.json` with that `template_sha`, and check with `mk apps sync --check <path>`. Record every owned path and package key the app doesn't carry in the stamp's `opt_out`, and name the app's own gate in `checks` (README, "Sync contract"), so a later sync never writes over the app's runtime.
 
 ## 2. Port the app
 

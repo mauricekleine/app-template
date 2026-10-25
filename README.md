@@ -74,7 +74,7 @@ The verifier polls `/api/deploy.json` with cache bypass until the SHA matches ex
 
 ## Sync contract, version 1
 
-`template.json` is the template manifest, copied into each app. `.mk/app.json` is app-owned state. Future `mk apps create` and `mk apps sync` consume them; those commands are not implemented here.
+`template.json` is the template manifest, copied into each app. `.mk/app.json` is app-owned state. `mk apps create` and `mk apps sync` (dotfiles `mk apps`) consume them.
 
 The manifest has `schema_version`, `version`, an explicit `files` array, `package_json.owned_keys` and `registry` (`version`, `url`, `items`). Every listed path is relative to the repository root, with no globs. Registry transitive files are listed too. Files outside this list belong to the app. Git file modes travel with owned files. App-specific routes, the root document, identity, styles, mark and product/design docs are intentionally app-owned. `src/routeTree.gen.ts` and `bun.lock` are derived artifacts: regenerate the route tree through Vite and the lock through Bun after a sync, rather than treating them as owned text.
 
@@ -94,12 +94,26 @@ The app stamp is:
 
 In this source template only, `template_sha: null` means "this checkout is the template itself". A source cannot embed its own future commit hash. Creation must replace it with the full template commit used to create the app. In an app it is a required full 40-character SHA: the last successfully applied template revision, never the app's HEAD or its deploy SHA. `target` is `soliton` or `cloudflare`; `name` is the app's name. `soliton` holds the live and smoke ports for the Soliton target; Cloudflare apps omit it. Creation sets all of these, and sync preserves them.
 
+An app that adopts the template in place around a runtime of its own records what it doesn't carry in the stamp, beside the fields above:
+
+```json
+{
+  "opt_out": {
+    "files": ["AGENTS.md", "src/", "tools/"],
+    "package_json": ["/scripts/", "/devDependencies/husky"]
+  },
+  "checks": ["bun install", "bun run verify", "bun run build"]
+}
+```
+
+`opt_out.files` names owned paths; an entry ending in `/` covers every owned path under it, including paths a later manifest adds. `opt_out.package_json` names owned pointers the same way: `/scripts/` covers every owned script. Sync never treats an opted-out path or key as a candidate: it doesn't write, merge or delete it, and it leaves the `@mk` mapping alone when `components.json` is opted out. `checks` replaces sync's default validation with the app's own gate, each entry a command run from the app root in order. An opt-out only narrows the boundary the template's manifests draw. Orbit's `.mk/app.json` is the worked example.
+
 For a sync from base `template_sha` to a selected template commit:
 
-1. Read both template manifests at those commits. Their union defines the files and package leaves to consider, including additions and deletions. An unowned file or package key is never a sync candidate.
+1. Read both template manifests at those commits. Their union, minus the app's opt-outs, defines the files and package leaves to consider, including additions and deletions. An unowned or opted-out file or package key is never a sync candidate.
 2. Three-way merge each candidate using the old template content as base, the current app as ours, and the new template as theirs. A locally edited owned file is a real merge input, not permission to overwrite it. Remove a formerly owned file/key only when the merge is clean; leave the conflict for an agent otherwise. After that one transition, a path removed from ownership belongs to the app.
 3. Update the registry snapshot mapping and items using the incoming manifest. Review and merge registry source like other owned files. `src/styles.css` remains app-owned: preserve its imports of the installed theme, Tailwind, tw-animate-css and shadcn's Tailwind CSS.
-4. Regenerate the lock and route tree, build both targets and run the checks. Update `.mk/app.json.template_sha` to the incoming full commit only after the sync is complete. A clean sync opens a normal PR; a conflict needs an agent. Neither is a deployment.
+4. Regenerate the lock and route tree, build both targets and run the checks (the stamp's `checks` when it names them). Update `.mk/app.json.template_sha` to the incoming full commit only after the sync is complete. A clean sync opens a normal PR; a conflict needs an agent. Neither is a deployment.
 
 The build stamp's `template_version` is the manifest's release version; `template_sha` is the exact sync base. They serve different purposes. The manifest itself is owned so the installed contract advances with a sync. A synchronizer must read the template's manifests, not trust an app's edited ownership list to expand the boundary.
 
