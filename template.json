@@ -37,11 +37,13 @@
     "taze.config.ts",
     "template.json",
     "test/serve.test.ts",
+    "test/static-site.test.ts",
     "tools/a11y.ts",
     "tools/build-info.ts",
     "tools/deploy-verify.ts",
     "tools/registry-install.ts",
     "tools/soliton-process.ts",
+    "tools/static-site.ts",
     "tsconfig.json",
     "vite.config.ts"
   ],
