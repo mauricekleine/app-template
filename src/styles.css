@@ -1,0 +1,5 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "./components/superthread/styles/superthread.css";
+@import "./page.css";

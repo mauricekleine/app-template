@@ -1,0 +1,17 @@
+# Replace APP_NAME, APP_DIR, BUN_PATH and PORT. Install as APP_NAME.service.
+[Unit]
+Description=APP_NAME
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=APP_DIR
+Environment=NODE_ENV=production
+Environment=PORT=PORT_NUMBER
+ExecStart=BUN_PATH run start
+Restart=on-failure
+RestartSec=3
+KillSignal=SIGTERM
+
+[Install]
+WantedBy=default.target

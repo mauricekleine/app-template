@@ -1,0 +1,4 @@
+# Replace APP_HOST and PORT_NUMBER. The Bun listener is loopback only.
+APP_HOST {
+    reverse_proxy 127.0.0.1:PORT_NUMBER
+}
