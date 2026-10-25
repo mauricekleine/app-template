@@ -1,7 +1,7 @@
-# App-owned upstream shape; merge into the existing tailnet-restricted host block.
+# The upstream an app's vhost proxies to. Access control lives in the vhost file Soliton installs
+# (infra/soliton/caddy/<app>.caddy in mauricekleine/soliton, which restricts to the tailnet); copy only
+# this reverse_proxy block into it and keep that file's matcher.
 APP_HOST {
-    @outside not remote_ip 100.64.0.0/10 fd7a:115c:a1e0::/48 127.0.0.1 ::1
-    respond @outside 403
     reverse_proxy 127.0.0.1:PORT_NUMBER {
         # Deliver quiet SSE promptly; leave stream lifetime unbounded.
         flush_interval -1
