@@ -15,7 +15,9 @@ const server = Bun.serve({
     // before invoking Start, including time spent awaiting the first chunk.
     if (url.pathname.startsWith("/api/streams/")) server.timeout(request, 0);
 
-    if (request.method === "GET" || request.method === "HEAD") {
+    // Delivery checks always come from the server, even when a static build also wrote them to dist/client.
+    const delivery = url.pathname === "/healthz" || url.pathname === "/api/deploy.json";
+    if (!delivery && (request.method === "GET" || request.method === "HEAD")) {
       let pathname: string;
       try {
         pathname = decodeURIComponent(url.pathname);
