@@ -15,7 +15,18 @@ mk apps create <name> --target soliton --port <live port>
 
 If an older repository already has the name, rename it first (quanta's became `quanta-archive`). GitHub keeps answering the old name with a redirect; create treats a redirect as a free name. If the live app keeps state under `~/projects/<name>`, run create with `MK_APPS_ROOT` pointing at another directory, so its bootstrap worktree doesn't collide with the live data. The checkout moves into place at cut-over.
 
-To adopt the template in place instead (orbit): copy the owned files that fit the app from `template.json` at one template commit, write `.mk/app.json` with that `template_sha`, and check with `mk apps sync --check <path>`. Record every owned path and package key the app doesn't carry in the stamp's `opt_out`, and name the app's own gate in `checks` (README, "Sync contract"), so a later sync never writes over the app's runtime.
+To adopt the template in place instead, see [Adopting in place](#adopting-in-place).
+
+### Adopting in place
+
+Orbit kept its repository, runtime and deploy path (mauricekleine/orbit#28). Copy the owned files that fit the app from `template.json` at one template commit, write `.mk/app.json` with that `template_sha`, and check with `mk apps sync --check <path>`.
+
+- **Opt-outs.** Record every owned path and package key the app doesn't carry in the stamp's `opt_out`, and name the app's own gate in `checks` (README, "Sync contract"). Opt out of directories with a trailing `/` (`src/`, `tools/`, `test/`): the template adds files there, and a new owned file would otherwise land in the app.
+- **`.gitignore`.** Keep the template's lines first and the app's own below a `# <name>` line, so template edits merge three-way.
+- **Formatter and linter.** If the app's formatter or linter would rewrite an owned file (orbit's rewrote `taze.config.ts`), add it to the app's ignores. A reformatted owned file diverges on every sync.
+- **Hooks.** `.husky/pre-commit` runs `bun-canary lint --staged`, which appends `--staged` to the app's own `lint` script. Opt out of `.husky/` and `husky` unless that script accepts it.
+- **Deploy stamp.** An app that isn't on TanStack Start serves `/api/deploy.json` itself, with `framework`, `sha`, `target`, `template_version` and `superthread_version`, so `mk apps ls` reads it.
+- **Prove the opt-outs.** At adoption, base and head are the same commit, so `--check` reports `current` whatever the stamp says. Commit a change to a clone of the template that touches carried files, opted-out files and a script, and run `MK_APPS_TEMPLATE_ROOT=<clone> mk apps sync --check <path>`. Expect `behind` with only the carried files listed.
 
 ## 2. Port the app
 
@@ -24,6 +35,8 @@ Work in create's bootstrap worktree. Keep every owned file as the template has i
 - **Routes.** Each page becomes a file route. Pages that share data sit under one pathless layout whose loader calls a `createServerFn`. The server function reads the app's state directory from an environment variable at request time, so a nightly job needs no restart. Call `router.invalidate()` on focus to pick up new data.
 - **Domain code.** Copy data files, rules and their tests unchanged. Fix real bugs you find on the way, each with a test.
 - **Components.** Replace hand-copied components with `@mk` items (`bunx --bun shadcn@latest add @mk/<item>`), and model each page on the gallery's mock ship pages. `shadcn add` loosens the owned `~` pins in `package.json` to `^`: restore the file and re-apply only the app's own changes (name, dependencies, scripts).
+- **Checking installed items.** The shadcn CLI drops an item's leading comment lines on install (`lib/fleet.ts`, `ui/glyphs.tsx`). Compare installed files with the registry's JSON ignoring those lines; everything else matches byte for byte.
+- **A Vite SPA.** An app outside Start puts the mode script first in `index.html`'s `<head>` and keeps its own `components.json` beside its sources (orbit's `web/`).
 - **App CSS.** Put element defaults (`html`, `body`, `a`) in `@layer base`, so item utilities win. Scope link colour to the working panel: an unlayered `a { color }` turns the ship nav plum and fails contrast. Keep `src/page.css` to layout; values come from the tokens.
 - **Landmarks.** `@mk/app-shell` 2.0.0 prints the ship's name outside every landmark. Until the item fixes it, pass `role="banner"` to `AppShellNav`.
 - **Hydration.** Compute dates from a day string the server passes in, in UTC, and format times with a fixed `timeZone`. Server and client then render the same markup.
