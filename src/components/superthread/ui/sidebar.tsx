@@ -12,7 +12,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { Skeleton } from "@/components/superthread/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/superthread/ui/tooltip";
 import { Icon } from "@/components/superthread/ui/glyphs";
-// @mk/sidebar 2.0.0-next.1
+// @mk/sidebar 2.0.0
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;

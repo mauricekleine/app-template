@@ -63,4 +63,4 @@ export const fleet = [
 
 export type Ship = (typeof fleet)[number]
 export type ShipId = Ship["id"]
-// @mk/fleet 2.0.0-next.1
+// @mk/fleet 2.0.0

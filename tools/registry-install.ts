@@ -1,12 +1,14 @@
 import { readFile, writeFile } from "node:fs/promises";
 
-const manifest = (await Bun.file("template.json").json()) as { registry: { items: string[] } };
+const manifest = (await Bun.file("template.json").json()) as { registry: { items: string[]; url: string } };
 const packageBefore = await readFile("package.json", "utf8");
 const componentsBefore = await readFile("components.json", "utf8");
 try {
-  // The committed app resolves a snapshot. Only this explicit canary/install uses live.
+  // Keep the canary on live; release upgrades can explicitly reinstall the manifest snapshot.
   const components = JSON.parse(componentsBefore);
-  components.registries["@mk"] = "https://superthread.mauricekleine.com/r/{name}.json";
+  components.registries["@mk"] = process.argv.includes("--snapshot")
+    ? manifest.registry.url
+    : "https://superthread.mauricekleine.com/r/{name}.json";
   await writeFile("components.json", JSON.stringify(components, null, 2) + "\n");
   const command = Bun.spawn(["bun", "--bun", "shadcn", "add", ...manifest.registry.items, "--yes", "--overwrite"], {
     stdout: "inherit",
