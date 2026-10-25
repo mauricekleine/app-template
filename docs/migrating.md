@@ -11,7 +11,7 @@ mk apps create <name> --target soliton --port <live port>
 `--port` keeps the live port, unit name, vhost and fleet ship. Create picks a free smoke port, prepends it as a comment to the existing vhost and copies the ship's mark. It opens two PRs:
 
 - **The app PR.** Mark it draft at once (`gh pr ready <n> --undo`): it holds only the template's starter page until the port lands.
-- **The soliton PR.** It adds the repository to the CI runner allowlists. The slot name is also hard-coded in `runner-home.py`, `migrate-runner-homes.py`, `update-runner-slots.py`, `runner-versions.py`, `runner-health.py`, `hyperspeed-ci-report.py`, their tests and the README. Extend all of them in the same PR, as soliton#697 did for constellation. None is a held host input, so the App merges it. Then run `bash infra/hyperspeed-ci/add-repo-runners.sh mauricekleine/<name>` on Soliton and confirm both runners are online in the repository's Actions settings.
+- **The soliton PR.** Create adds the repository to `infra/hyperspeed-ci/runner-repositories.json`, the one runner inventory every runner script reads. It is not a held host input, so the App merges it. Then run `bash infra/hyperspeed-ci/add-repo-runners.sh mauricekleine/<name>` on Soliton, which also stages the inventory and helpers on the CI guest, and confirm both runners are online in the repository's Actions settings.
 
 To adopt the template in place instead (orbit): copy the owned files from `template.json` at one template commit, write `.mk/app.json` with that `template_sha`, and check with `mk apps sync --check <path>`.
 
@@ -37,7 +37,7 @@ The app repository owns its units in `infra/soliton/`:
 - `<name>.service`: `app.service` with the old port and the app's environment, such as its state directory.
 - Each timer job: a oneshot service and its timer. The service runs from `~/.local/share/start-app/<name>/current` through a `run.sh` that resolves `.env.tpl` with `op run`. Secrets never touch a file.
 
-The vhost stays in soliton. Change it only if the app streams responses (`flush_interval -1`); that change is a held host input.
+The vhost stays in soliton. Change it only if the app streams responses (`flush_interval -1`). A vhost change merges through the App; Maurice applies it with the attended Caddy install.
 
 ## 4. Cut over
 
