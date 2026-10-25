@@ -1,7 +1,7 @@
 import * as React from "react";
 import { Input as InputPrimitive } from "@base-ui/react/input";
 import { cn } from "@/components/superthread/lib/utils";
-// @mk/input 2.0.0-next.1
+// @mk/input 2.0.0
 
 // A field whose box is its own text control. Focus thickens the 1 px edge to 2 px inside the box, in --fx: the
 // house ink, or the error ink when the field is invalid (the caret follows). Nothing outside the box draws, so the

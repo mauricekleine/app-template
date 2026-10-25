@@ -88,8 +88,8 @@
     ]
   },
   "registry": {
-    "version": "2.0.0-next.1",
-    "url": "https://superthread.mauricekleine.com/r/v/2.0.0-next.1/{name}.json",
+    "version": "2.0.0",
+    "url": "https://superthread.mauricekleine.com/r/v/2.0.0/{name}.json",
     "items": ["@mk/tokens", "@mk/fleet-rail", "@mk/button", "@mk/badge"]
   }
 }
