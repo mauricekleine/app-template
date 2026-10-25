@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.cloudflare/
+.wrangler/
+.tanstack/
+public/api/deploy.json
+.env
+.env.local
+.shots/

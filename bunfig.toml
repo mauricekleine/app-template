@@ -1,0 +1,22 @@
+[install]
+minimumReleaseAge = 259200
+
+[fmt]
+printWidth = 120
+sortPackageJson = true
+ignorePatterns = [
+  "src/components/superthread/**",
+  "src/routeTree.gen.ts",
+  "public/api/deploy.json",
+  "dist/**",
+  ".cloudflare/**",
+]
+
+[lint]
+ignorePatterns = [
+  "src/components/superthread/**",
+  "src/routeTree.gen.ts",
+  "public/api/deploy.json",
+  "dist/**",
+  ".cloudflare/**",
+]
