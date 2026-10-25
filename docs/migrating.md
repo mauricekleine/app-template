@@ -47,7 +47,7 @@ After the app PR merges, on Soliton:
 2. Clone the app repository. Install its units with `install -m 0644 infra/soliton/<unit> ~/.config/systemd/user/`, then run `systemctl --user daemon-reload`.
 3. Run `bash infra/soliton/deploy.sh <merge sha>`. It builds, smoke-tests on the smoke port, switches `current` and restarts the unit, which replaces the old process on the same port.
 4. Enable the timers. Start each timer job once by hand and check its output.
-5. Verify the live URL from the tailnet: every page, the data, and the browser console. Measure a second release and a `--rollback` against the bounds: restart under 2 s, rollback under 5 s, RSS under 128 MiB.
+5. Verify the live URL from the tailnet: every page, the data, and the browser console. Measure a second release and a `--rollback` against the bounds: restart under 2 s, rollback under 5 s, RSS under 128 MiB. Constellation measured a 0.09 s restart to healthy, a 0.16 s rollback and 84 MiB RSS; read RSS from `VmRSS` in `/proc/<pid>/status`.
 
 To roll back to the old app, restore the backed-up units, run `daemon-reload` and restart the unit. The old code stays in its old repository until step 5.
 
