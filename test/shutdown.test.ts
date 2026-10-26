@@ -16,6 +16,25 @@ test("SIGTERM waits for the app's shutdown hooks before the server exits", async
   }
 });
 
+test("a request in flight at SIGTERM finishes before the hooks run", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "shutdown-"));
+  try {
+    const marker = join(dir, "marker");
+    const app = await startSoliton({ preload: "./test/fixtures/shutdown-hook.ts", env: { SHUTDOWN_MARKER: marker } });
+    const slow = fetch(new URL("/__slow", app.url));
+    // Signal only once the handler has the request; before that the drain has nothing to wait for.
+    while (!(await Bun.file(marker).exists())) await Bun.sleep(10);
+    const exited = app.stop();
+    const response = await slow;
+    // No such page: Start answers 404, which is still a complete response.
+    expect(response.status).toBe(404);
+    expect(await exited).toBe(0);
+    expect(await readFile(marker, "utf8")).toBe("started\nrequest\nflushed\n");
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
 test("a request arriving while the hooks run is refused, so nothing is acknowledged after the flush", async () => {
   const dir = await mkdtemp(join(tmpdir(), "shutdown-"));
   try {
