@@ -20,7 +20,7 @@ The first page and the unknown-route page are real Start renders. Void is the in
 
 ## Superthread
 
-`components.json` maps `@mk` directly to the immutable `2.0.0` snapshot at `https://superthread.mauricekleine.com/r/v/2.0.0/{name}.json`. The installed tokens, fleet rail, button and badge (including their dependency closure) came from that snapshot through shadcn 4.22.1. Their source and retained version stamps live under `src/components/superthread/`. The app imports the installed CSS; it does not reproduce the theme.
+`components.json` maps `@mk` directly to the immutable `2.1.1` snapshot at `https://superthread.mauricekleine.com/r/v/2.1.1/{name}.json`. The installed tokens, fleet rail, button and badge (including their dependency closure) came from that snapshot through shadcn 4.22.1. Their source and retained version stamps live under `src/components/superthread/`. The app imports the installed CSS; it does not reproduce the theme.
 
 ```sh
 bun --bun shadcn add @mk/button --yes --overwrite
@@ -58,7 +58,7 @@ A static page has no server to send headers, so its content security policy trav
 {
   "sha": "<40-character build commit>",
   "framework": "tanstack-start",
-  "superthread_version": "2.0.0",
+  "superthread_version": "2.1.1",
   "template_version": "1.0.0",
   "target": "soliton"
 }
@@ -130,7 +130,7 @@ bun run test:a11y
 
 On Soliton, wrap blocking commands in `~/.local/bin/hyperspeed-run --`. The HTTP tests start the real production server on an ephemeral loopback port and stop only their own process. They cover health, build identity, page and 404 rendering, cache policy, and the verifier's exact-match and stale-build outcomes. The browser check runs axe on the first page in void and paper, failing on violations and unresolved contrast findings. It checks mobile 404 recovery and browser diagnostics too. Chromium's expected network console message for the unknown document's HTTP 404 is the only allowed diagnostic; missing assets, JavaScript errors and hydration warnings still fail.
 
-`.github/workflows/ci.yml` runs only on GitHub-hosted Ubuntu. Its required check name is **`template-ci`**. `.github/workflows/registry-canary.yml` runs daily at **05:17 UTC** and on manual dispatch, reinstalling live `@mk` items before building and testing both targets and running the same browser check. Its check name is **`registry-canary`**. A failed scheduled job is a visible failed Actions run; GitHub's workflow notification settings deliver it to subscribers.
+`.github/workflows/ci.yml` runs only on GitHub-hosted Ubuntu. Its required check name is **`template-ci`**. Apps can opt into an additional browser suite by defining the app-owned `test:browser` script (for example, `"test:browser": "bun run test:library"`); CI runs it after Chromium is installed and the shared accessibility check passes. The template does not own that package key. `.github/workflows/registry-canary.yml` runs daily at **05:17 UTC** and on manual dispatch, reinstalling live `@mk` items before building and testing both targets and running the same browser check. Its check name is **`registry-canary`**. A failed scheduled job is a visible failed Actions run; GitHub's workflow notification settings deliver it to subscribers.
 
 The pre-commit hook formats staged files with pinned Bun and lints them with bun-canary when available. Registry files have separate formatter and linter ignores so their provenance stays intact. `taze.config.ts` reads Bun's three-day minimum release age from `bunfig.toml`.
 

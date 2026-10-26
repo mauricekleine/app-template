@@ -4,7 +4,7 @@ import { fleet, type ShipId } from "@/components/superthread/lib/fleet";
 import { cn } from "@/components/superthread/lib/utils";
 import { Sidebar, SidebarProvider } from "@/components/superthread/ui/sidebar";
 import { TooltipProvider } from "@/components/superthread/ui/tooltip";
-// @mk/fleet-rail 2.0.0
+// @mk/fleet-rail 2.1.1
 
 const MARK_BASE = "https://superthread.mauricekleine.com/marks";
 

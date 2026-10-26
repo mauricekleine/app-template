@@ -2,7 +2,7 @@ import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/components/superthread/lib/utils";
 import { Icon } from "@/components/superthread/ui/glyphs";
-// @mk/button 2.0.0
+// @mk/button 2.1.1
 
 // Square, 1 px edges, one chromatic ink. Hover and press come from the --*-hover and --*-press roles (light
 // overprints key, dark lifts the ink). Focus is the base layer's 2 px house ring at 2 px offset, so nothing here

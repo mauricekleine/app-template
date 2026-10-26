@@ -4,7 +4,7 @@ import { cn } from "@/components/superthread/lib/utils"
 
 import { Button } from "@/components/superthread/ui/button"
 import { Icon } from "@/components/superthread/ui/glyphs"
-// @mk/sheet 2.0.0
+// @mk/sheet 2.1.1
 
 function Sheet({ ...props }: SheetPrimitive.Root.Props) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />
