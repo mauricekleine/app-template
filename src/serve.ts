@@ -31,7 +31,6 @@ const server = Bun.serve({
     }
   },
 });
-console.log(`app listening on ${server.url}`);
 
 async function handle(request: Request, url: URL, server: Bun.Server<undefined>): Promise<Response> {
   // App stream routes live under /api/streams/. Disable Bun's 10s idle close
@@ -77,3 +76,6 @@ for (const signal of ["SIGTERM", "SIGINT"] as const) {
       .then(() => process.exit(0));
   });
 }
+
+// Announce readiness only once the handlers exist: tools/soliton-process.ts may signal as soon as it reads this line.
+console.log(`app listening on ${server.url}`);
