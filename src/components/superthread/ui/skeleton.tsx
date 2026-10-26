@@ -1,5 +1,5 @@
 import { cn } from "@/components/superthread/lib/utils";
-// @mk/skeleton 2.0.0
+// @mk/skeleton 2.1.1
 
 // A placeholder prints the first ink through the 18.75 percent screen (texture-skeleton), still, on whole-pixel bars:
 // 12 px tall unless sized, and square.

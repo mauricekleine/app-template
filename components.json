@@ -19,6 +19,6 @@
     "hooks": "@/hooks"
   },
   "registries": {
-    "@mk": "https://superthread.mauricekleine.com/r/v/2.0.0/{name}.json"
+    "@mk": "https://superthread.mauricekleine.com/r/v/2.1.1/{name}.json"
   }
 }

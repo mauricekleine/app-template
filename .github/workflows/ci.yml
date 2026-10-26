@@ -25,3 +25,5 @@ jobs:
       - run: bun run test
       - run: bunx playwright install --with-deps chromium
       - run: bun run test:a11y
+      - name: app-owned browser tests (optional)
+        run: bun run --if-present test:browser

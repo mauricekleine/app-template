@@ -3,7 +3,7 @@ import { useRender } from "@base-ui/react/use-render";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/components/superthread/lib/utils";
 import { StatusGlyph, type StatusState } from "@/components/superthread/ui/glyphs";
-// @mk/badge 2.0.0
+// @mk/badge 2.1.1
 
 // Square, 1 px edge, 13 px words. A status badge is the sanctioned exception to one colour, at badge scale only: a
 // fill near the stock, the edge at about half strength, the 14 px glyph square at full strength and the word.

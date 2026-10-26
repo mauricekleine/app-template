@@ -58,9 +58,19 @@ export const fleet = [
       "light": "soliton.svg",
       "dark": "soliton-dark.svg"
     }
+  },
+  {
+    "id": "pilot",
+    "name": "pilot",
+    "desc": "a new star",
+    "angle": 1,
+    "mark": {
+      "light": "pilot.svg",
+      "dark": "pilot-dark.svg"
+    }
   }
 ] as const
 
 export type Ship = (typeof fleet)[number]
 export type ShipId = Ship["id"]
-// @mk/fleet 2.0.0
+// @mk/fleet 2.1.1
