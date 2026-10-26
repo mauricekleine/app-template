@@ -1,7 +1,8 @@
 // Shared lifecycle for HTTP acceptance and browser checks, using the real entrypoint.
-export async function startSoliton() {
-  const child = Bun.spawn(["bun", "src/serve.ts"], {
-    env: { ...process.env, PORT: "0", NODE_ENV: "production" },
+export async function startSoliton(options: { preload?: string; env?: Record<string, string> } = {}) {
+  const preload = options.preload ? ["--preload", options.preload] : [];
+  const child = Bun.spawn(["bun", ...preload, "src/serve.ts"], {
+    env: { ...process.env, ...options.env, PORT: "0", NODE_ENV: "production" },
     stdout: "pipe",
     stderr: "inherit",
   });
@@ -19,7 +20,7 @@ export async function startSoliton() {
           url,
           stop: async () => {
             child.kill("SIGTERM");
-            await child.exited;
+            return await child.exited;
           },
         };
     }

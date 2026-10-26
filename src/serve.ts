@@ -1,4 +1,5 @@
 import { resolve, sep } from "node:path";
+import { runShutdown } from "./shutdown";
 
 // Keep the adapter outside the Vite graph. The built Start app exposes one fetch.
 const entry = new URL("../dist/server/server.js", import.meta.url).href;
@@ -43,8 +44,15 @@ const server = Bun.serve({
 });
 console.log(`app listening on ${server.url}`);
 
+// The first signal lets the app finish its shutdown hooks (src/shutdown.ts), then stops the listener.
+// A second signal exits at once. The unit's TimeoutStopSec bounds a hook that never finishes.
+let stopping = false;
 for (const signal of ["SIGTERM", "SIGINT"] as const) {
   process.on(signal, () => {
-    void server.stop(true).then(() => process.exit(0));
+    if (stopping) process.exit(1);
+    stopping = true;
+    void runShutdown()
+      .then(() => server.stop(true))
+      .then(() => process.exit(0));
   });
 }
