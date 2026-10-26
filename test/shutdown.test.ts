@@ -16,6 +16,27 @@ test("SIGTERM waits for the app's shutdown hooks before the server exits", async
   }
 });
 
+test("a request arriving while the hooks run is refused, so nothing is acknowledged after the flush", async () => {
+  const dir = await mkdtemp(join(tmpdir(), "shutdown-"));
+  try {
+    const marker = join(dir, "marker");
+    const app = await startSoliton({ preload: "./test/fixtures/shutdown-hook.ts", env: { SHUTDOWN_MARKER: marker } });
+    expect((await fetch(new URL("/healthz", app.url))).status).toBe(200);
+    const exited = app.stop();
+    await Bun.sleep(100);
+    // Over the kept-alive connection the drain answers 503; a new connection finds the listener closed.
+    const late = await fetch(new URL("/healthz", app.url)).then(
+      (response) => response.status,
+      () => "refused",
+    );
+    expect(late === 503 || late === "refused").toBe(true);
+    expect(await exited).toBe(0);
+    expect(await readFile(marker, "utf8")).toBe("flushed\n");
+  } finally {
+    await rm(dir, { recursive: true, force: true });
+  }
+});
+
 test("a second copy of the module shares the registry, as the built server bundle does", async () => {
   const first = await import("../src/shutdown");
   const second = await import(`../src/shutdown.ts?copy=${Date.now()}`);
