@@ -67,10 +67,10 @@ A static page has no server to send headers, so its content security policy trav
 The SHA comes from `WORKERS_CI_COMMIT_SHA`, then `GITHUB_SHA`, then git HEAD. Registry version comes from the installed tokens' stamp; template version comes from `template.json`. The target records the actual build, and neither delivery endpoint is cached.
 
 ```sh
-DEPLOY_URL=https://your-app.example bun run deploy:verify <full-sha>
+bun run deploy:verify <full-sha>
 ```
 
-The verifier polls `/api/deploy.json` with cache bypass until the SHA matches exactly. It exits 0 on a match, 1 on invalid configuration or timeout. `DEPLOY_VERIFY_TIMEOUT` is seconds, default 1200. A newer SHA does not silently count as the requested build. Point it at loopback to check a local build.
+It checks `https://<name>.mauricekleine.com`, with the name from `.mk/app.json`; set `DEPLOY_URL` to check another host. The verifier polls `/api/deploy.json` with cache bypass until the SHA matches exactly. It exits 0 on a match, 1 on invalid configuration or timeout. `DEPLOY_VERIFY_TIMEOUT` is seconds, default 1200. A newer SHA does not silently count as the requested build. Point it at loopback to check a local build.
 
 ## Sync contract, version 1
 
