@@ -9,7 +9,7 @@
     "build": "bun run build:soliton && bun run build:cloudflare",
     "build:soliton": "vite build --mode soliton && bun --check",
     "build:cloudflare": "vite build --mode cloudflare && bun --check",
-    "deploy": "PATH=\"$HOME/.local/bin:$PATH\" cf deploy --prebuilt",
+    "deploy": "bun tools/cloudflare-deploy.ts",
     "start": "bun src/serve.ts",
     "typecheck": "bun --check",
     "test": "bun test",
