@@ -96,10 +96,15 @@ test("without DEPLOY_URL the verifier checks the app's own fleet address", async
       rmSync(cwd, { force: true, recursive: true });
     }
   };
-  const named = await verify({ name: "deploy-verify-probe", target: "soliton" });
+  const named = await verify({ name: "deploy-verify-probe", template_sha: "a".repeat(40), target: "soliton" });
   expect(named.code).toBe(1);
   expect(named.stderr).toContain("waiting for https://deploy-verify-probe.mauricekleine.com/api/deploy.json");
-  for (const stamp of [undefined, { name: "../elsewhere" }]) {
+  // No stamp, a path-like name, and the template's own unstamped checkout all need DEPLOY_URL.
+  for (const stamp of [
+    undefined,
+    { name: "../elsewhere", template_sha: "a".repeat(40) },
+    await Bun.file(".mk/app.json").json(),
+  ]) {
     const unnamed = await verify(stamp);
     expect(unnamed.code).toBe(1);
     expect(unnamed.stderr).toContain("set DEPLOY_URL");

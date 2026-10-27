@@ -2,13 +2,18 @@ const sha = process.argv[2];
 const timeout = Number(process.env.DEPLOY_VERIFY_TIMEOUT ?? 1200);
 
 // Fleet apps live at <name>.mauricekleine.com; DEPLOY_URL overrides it, for loopback or another host.
+// Only a stamped app has that address: the template's own stamp has no template_sha and no live host.
 async function deployUrl() {
   if (process.env.DEPLOY_URL) return process.env.DEPLOY_URL;
-  const stamp = Bun.file(".mk/app.json");
-  const name = (await stamp.exists()) ? ((await stamp.json()) as { name?: unknown }).name : undefined;
-  if (typeof name !== "string" || !/^[a-z0-9][a-z0-9-]*$/.test(name))
-    throw new Error("set DEPLOY_URL, or run from an app checkout whose .mk/app.json names the app");
-  return `https://${name}.mauricekleine.com`;
+  const file = Bun.file(".mk/app.json");
+  const stamp = (await file.exists()) ? ((await file.json()) as { name?: unknown; template_sha?: unknown }) : {};
+  if (
+    typeof stamp.template_sha !== "string" ||
+    typeof stamp.name !== "string" ||
+    !/^[a-z0-9][a-z0-9-]*$/.test(stamp.name)
+  )
+    throw new Error("set DEPLOY_URL, or run from a stamped app checkout whose .mk/app.json names the app");
+  return `https://${stamp.name}.mauricekleine.com`;
 }
 
 try {
