@@ -1,4 +1,7 @@
 import { afterAll, beforeAll, expect, test } from "bun:test";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { startSoliton } from "../tools/soliton-process";
 
 let app: Awaited<ReturnType<typeof startSoliton>>;
@@ -73,4 +76,37 @@ test("the deploy verifier accepts only the requested SHA and fails on a stale bu
   const stale = await verify(sha === "0".repeat(40) ? "1".repeat(40) : "0".repeat(40));
   expect(stale.code).toBe(1);
   expect(stale.stderr).toContain(`observed SHA ${sha}`);
+});
+
+test("without DEPLOY_URL the verifier checks the app's own fleet address", async () => {
+  const { DEPLOY_URL: _, ...env } = process.env;
+  const tool = new URL("../tools/deploy-verify.ts", import.meta.url).pathname;
+  const verify = async (stamp?: object) => {
+    const cwd = mkdtempSync(join(tmpdir(), "deploy-verify-"));
+    try {
+      if (stamp) await Bun.write(join(cwd, ".mk/app.json"), JSON.stringify(stamp));
+      const child = Bun.spawn(["bun", tool, "0".repeat(40)], {
+        cwd,
+        env: { ...env, DEPLOY_VERIFY_TIMEOUT: "1" },
+        stderr: "pipe",
+      });
+      const [stderr, code] = await Promise.all([new Response(child.stderr).text(), child.exited]);
+      return { stderr, code };
+    } finally {
+      rmSync(cwd, { force: true, recursive: true });
+    }
+  };
+  const named = await verify({ name: "deploy-verify-probe", template_sha: "a".repeat(40), target: "soliton" });
+  expect(named.code).toBe(1);
+  expect(named.stderr).toContain("waiting for https://deploy-verify-probe.mauricekleine.com/api/deploy.json");
+  // No stamp, a path-like name, and the template's own unstamped checkout all need DEPLOY_URL.
+  for (const stamp of [
+    undefined,
+    { name: "../elsewhere", template_sha: "a".repeat(40) },
+    await Bun.file(".mk/app.json").json(),
+  ]) {
+    const unnamed = await verify(stamp);
+    expect(unnamed.code).toBe(1);
+    expect(unnamed.stderr).toContain("set DEPLOY_URL");
+  }
 });
