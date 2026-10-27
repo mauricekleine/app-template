@@ -1,5 +1,5 @@
 import { createCn } from "cn/config";
-// @mk/utils 2.1.1
+// @mk/utils 2.2.0
 
 // The type steps are font sizes (`text-<step>`), so cn merges them with Tailwind's own sizes.
 export const cn = createCn({
