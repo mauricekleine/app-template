@@ -99,11 +99,12 @@ test("without DEPLOY_URL the verifier checks the app's own fleet address", async
   const named = await verify({ name: "deploy-verify-probe", template_sha: "a".repeat(40), target: "soliton" });
   expect(named.code).toBe(1);
   expect(named.stderr).toContain("waiting for https://deploy-verify-probe.mauricekleine.com/api/deploy.json");
-  // No stamp, a path-like name, and the template's own unstamped checkout all need DEPLOY_URL.
+  // No stamp, a path-like name, and the template's own unstamped checkout all need DEPLOY_URL. The template
+  // stamp is written out, not read from .mk/app.json: in a synced app that file is the app's stamped one.
   for (const stamp of [
     undefined,
     { name: "../elsewhere", template_sha: "a".repeat(40) },
-    await Bun.file(".mk/app.json").json(),
+    { template: "mauricekleine/app-template", template_sha: null, target: "soliton", name: "app-template" },
   ]) {
     const unnamed = await verify(stamp);
     expect(unnamed.code).toBe(1);
