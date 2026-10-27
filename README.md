@@ -20,7 +20,7 @@ The first page and the unknown-route page are real Start renders. Void is the in
 
 ## Superthread
 
-`components.json` maps `@mk` directly to the immutable `2.1.1` snapshot at `https://superthread.mauricekleine.com/r/v/2.1.1/{name}.json`. The installed tokens, fleet rail, button and badge (including their dependency closure) came from that snapshot through shadcn 4.22.1. Their source and retained version stamps live under `src/components/superthread/`. The app imports the installed CSS; it does not reproduce the theme.
+`components.json` maps `@mk` directly to the immutable `2.2.0` snapshot at `https://superthread.mauricekleine.com/r/v/2.2.0/{name}.json`. The installed tokens, fleet rail, button and badge (including their dependency closure) came from that snapshot through shadcn 4.22.1. Their source and retained version stamps live under `src/components/superthread/`. The app imports the installed CSS; it does not reproduce the theme.
 
 ```sh
 bun --bun shadcn add @mk/button --yes --overwrite
@@ -30,7 +30,7 @@ bun run registry:install --snapshot  # reinstall the manifest snapshot
 
 The install helper selects the live mapping by default, or the manifest snapshot with `--snapshot`. It reinstalls `template.json`'s items, restores the snapshot mapping and existing dependency pins, and retains new registry dependencies. It then refreshes the lock. The scheduled canary runs this in a disposable checkout; it does not commit or publish anything. After a successful canary, a template upgrade deliberately updates the snapshot, manifest and installed items together.
 
-The rail ships without private hostnames. The template links only its public superthread home; other cells stay disabled until the app supplies destinations. Fonts and rail marks come from the public superthread host. Unbounded and Fragment Mono load for everyone. Supreme and Erode are restricted to Maurice's origins and localhost; other origins use the theme's system fallbacks. See the [registry documentation](https://superthread.mauricekleine.com/install).
+The rail links each fleet ship to the public url in superthread's fleet data, and its home mark to superthread; soliton has no url and stays disabled. An app passes `hrefs` only to change a link: `"/"` for its own ship once it joins the fleet, `null` to unlink a cell. Fonts and rail marks come from the public superthread host. Unbounded and Fragment Mono load for everyone. Supreme and Erode are restricted to Maurice's origins and localhost; other origins use the theme's system fallbacks. See the [registry documentation](https://superthread.mauricekleine.com/install).
 
 ## Two targets
 
@@ -58,7 +58,7 @@ A static page has no server to send headers, so its content security policy trav
 {
   "sha": "<40-character build commit>",
   "framework": "tanstack-start",
-  "superthread_version": "2.1.1",
+  "superthread_version": "2.2.0",
   "template_version": "1.0.0",
   "target": "soliton"
 }

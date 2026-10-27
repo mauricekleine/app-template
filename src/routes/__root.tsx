@@ -36,7 +36,7 @@ function Document() {
         <a href="#main" className="skip-link">
           skip to content
         </a>
-        <FleetRail current="app-template" hrefs={{ home: "https://superthread.mauricekleine.com" }}>
+        <FleetRail current="app-template">
           <div className="ship-panel">
             <header className="masthead">
               <Link to="/" className="ship-name">

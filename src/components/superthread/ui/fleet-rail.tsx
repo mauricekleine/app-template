@@ -1,10 +1,10 @@
 import { type ReactNode, useId } from "react";
 
-import { fleet, type ShipId } from "@/components/superthread/lib/fleet";
+import { fleet, home as homeShip, type ShipId } from "@/components/superthread/lib/fleet";
 import { cn } from "@/components/superthread/lib/utils";
 import { Sidebar, SidebarProvider } from "@/components/superthread/ui/sidebar";
 import { TooltipProvider } from "@/components/superthread/ui/tooltip";
-// @mk/fleet-rail 2.1.1
+// @mk/fleet-rail 2.2.0
 
 const MARK_BASE = "https://superthread.mauricekleine.com/marks";
 
@@ -59,8 +59,9 @@ export function FleetRail({
   // the ship's own nav, beside the rail on the same ground
   sidebar?: ReactNode;
   children?: ReactNode;
-  // where each cell goes, and "home" for the superthread mark; a ship without one is a disabled cell
-  hrefs?: Partial<Record<ShipId | "home", string>>;
+  // where each cell goes, and "home" for the superthread mark. A ship left out links to its fleet url; null, or a
+  // ship with no url, is a disabled cell
+  hrefs?: Partial<Record<ShipId | "home", string | null>>;
   // the folder holding <id>/<id>.svg and <id>/<id>-dark.svg
   markBase?: string;
   // the rail's accessible name
@@ -72,6 +73,7 @@ export function FleetRail({
   const base = markBase.replace(/\/+$/, "");
   const mark = (id: string, file: string) => `${base}/${id}/${file}`;
   const homeMark = <img src={mark("superthread", "superthread-dark.svg")} alt="" width={32} height={32} />;
+  const homeHref = hrefs.home === undefined ? homeShip.url : hrefs.home;
 
   return (
     <TooltipProvider>
@@ -88,8 +90,8 @@ export function FleetRail({
           className={cn("flex shrink-0 items-start gap-4 p-4 [@media(max-width:900px)]:flex-col", ON_GROUND)}
         >
           <nav data-slot="fleet-rail" aria-label={label} className={nav}>
-            {hrefs.home ? (
-              <a data-slot="fleet-rail-home" href={hrefs.home} aria-label="superthread" className={home}>
+            {homeHref ? (
+              <a data-slot="fleet-rail-home" href={homeHref} aria-label="superthread" className={home}>
                 {homeMark}
               </a>
             ) : (
@@ -99,7 +101,8 @@ export function FleetRail({
             )}
             <ul className={list}>
               {fleet.map((ship, index) => {
-                const href = hrefs[ship.id];
+                const given = hrefs[ship.id];
+                const href = given === undefined ? ship.url : given;
                 const isCurrent = current === ship.id;
                 const describedBy = `${uid}-${ship.id}`;
                 const name = (

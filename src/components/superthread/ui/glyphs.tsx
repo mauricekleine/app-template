@@ -1,7 +1,7 @@
 import type { AriaAttributes } from "react"
 
 import { cn } from "@/components/superthread/lib/utils"
-// @mk/glyphs 2.1.1
+// @mk/glyphs 2.2.0
 
 // Every pixel icon (12 cells) and status glyph (14 cells) in tokens/glyphs.json, as whole-pixel squares.
 const ICONS = {
