@@ -70,7 +70,7 @@ The SHA comes from `WORKERS_CI_COMMIT_SHA`, then `GITHUB_SHA`, then git HEAD. Re
 bun run deploy:verify <full-sha>
 ```
 
-It checks `https://<name>.mauricekleine.com`, with the name from `.mk/app.json`; set `DEPLOY_URL` to check another host. The verifier polls `/api/deploy.json` with cache bypass until the SHA matches exactly. It exits 0 on a match, 1 on invalid configuration or timeout. `DEPLOY_VERIFY_TIMEOUT` is seconds, default 1200. A newer SHA does not silently count as the requested build. Point it at loopback to check a local build.
+In an app made from this template it checks `https://<name>.mauricekleine.com`, with the name from the stamped `.mk/app.json`; set `DEPLOY_URL` to check another host. This template's own checkout has no live host (its stamp has no `template_sha`), so here it needs `DEPLOY_URL`, for example `DEPLOY_URL=http://127.0.0.1:3000 bun run deploy:verify <full-sha>`. The verifier polls `/api/deploy.json` with cache bypass until the SHA matches exactly. It exits 0 on a match, 1 on invalid configuration or timeout. `DEPLOY_VERIFY_TIMEOUT` is seconds, default 1200. A newer SHA does not silently count as the requested build. Point it at loopback to check a local build.
 
 ## Sync contract, version 1
 
