@@ -63,6 +63,7 @@
       "/scripts/typecheck",
       "/scripts/test",
       "/scripts/test:a11y",
+      "/scripts/deploy",
       "/scripts/deploy:verify",
       "/scripts/registry:install",
       "/scripts/prepare",
