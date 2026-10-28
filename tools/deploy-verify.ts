@@ -9,6 +9,7 @@ async function deployUrl() {
   const stamp = (await file.exists()) ? ((await file.json()) as { name?: unknown; template_sha?: unknown }) : {};
   if (
     typeof stamp.template_sha !== "string" ||
+    !/^[0-9a-f]{40}$/.test(stamp.template_sha) ||
     typeof stamp.name !== "string" ||
     !/^[a-z0-9][a-z0-9-]*$/.test(stamp.name)
   )
