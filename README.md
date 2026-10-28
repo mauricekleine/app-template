@@ -70,7 +70,7 @@ The SHA comes from `WORKERS_CI_COMMIT_SHA`, then `GITHUB_SHA`, then git HEAD. Re
 bun run deploy:verify <full-sha>
 ```
 
-In an app made from this template it checks `https://<name>.mauricekleine.com`, with the name from the stamped `.mk/app.json`; set `DEPLOY_URL` to check another host. This template's own checkout has no live host (its stamp has no `template_sha`), so here it needs `DEPLOY_URL`, for example `DEPLOY_URL=http://127.0.0.1:3000 bun run deploy:verify <full-sha>`. The verifier polls `/api/deploy.json` with cache bypass until the SHA matches exactly. It exits 0 on a match, 1 on invalid configuration or timeout. `DEPLOY_VERIFY_TIMEOUT` is seconds, default 1200. A newer SHA does not silently count as the requested build. Point it at loopback to check a local build.
+In an app made from this template it checks `https://<name>.mauricekleine.com`, with the name from the stamped `.mk/app.json`. An app hosted elsewhere records its https address as the stamp's `url` (seds: `"url": "https://sedsngo.org"`); `DEPLOY_URL` overrides both. This template's own checkout has no live host (its stamp has no `template_sha`), so here it needs `DEPLOY_URL`, for example `DEPLOY_URL=http://127.0.0.1:3000 bun run deploy:verify <full-sha>`. The verifier polls `/api/deploy.json` with cache bypass until the SHA matches exactly. It exits 0 on a match, 1 on invalid configuration or timeout. `DEPLOY_VERIFY_TIMEOUT` is seconds, default 1200. A newer SHA does not silently count as the requested build. Point it at loopback to check a local build.
 
 ## Sync contract, version 1
 
@@ -92,7 +92,7 @@ The app stamp is:
 }
 ```
 
-In this source template only, `template_sha: null` means "this checkout is the template itself". A source cannot embed its own future commit hash. Creation must replace it with the full template commit used to create the app. In an app it is a required full 40-character SHA: the last successfully applied template revision, never the app's HEAD or its deploy SHA. `target` is `soliton` or `cloudflare`; `name` is the app's name. `soliton` holds the live and smoke ports for the Soliton target; Cloudflare apps omit it. Creation sets all of these, and sync preserves them.
+In this source template only, `template_sha: null` means "this checkout is the template itself". A source cannot embed its own future commit hash. Creation must replace it with the full template commit used to create the app. In an app it is a required full 40-character SHA: the last successfully applied template revision, never the app's HEAD or its deploy SHA. `target` is `soliton` or `cloudflare`; `name` is the app's name. `soliton` holds the live and smoke ports for the Soliton target; Cloudflare apps omit it. Optional `url` is the app's https address when it doesn't live at `<name>.mauricekleine.com`. Creation sets all of these, and sync preserves them.
 
 An app that adopts the template in place around a runtime of its own records what it doesn't carry in the stamp, beside the fields above:
 

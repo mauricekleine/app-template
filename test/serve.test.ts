@@ -99,13 +99,29 @@ test("without DEPLOY_URL the verifier checks the app's own fleet address", async
   const named = await verify({ name: "deploy-verify-probe", template_sha: "a".repeat(40), target: "soliton" });
   expect(named.code).toBe(1);
   expect(named.stderr).toContain("waiting for https://deploy-verify-probe.mauricekleine.com/api/deploy.json");
-  // No stamp, a path-like name, a malformed template_sha and the template's own unstamped checkout all need
+  // An app hosted elsewhere names its address in the stamp; only https counts.
+  const hosted = await verify({
+    name: "deploy-verify-probe",
+    template_sha: "a".repeat(40),
+    url: "https://probe.invalid",
+  });
+  expect(hosted.code).toBe(1);
+  expect(hosted.stderr).toContain("waiting for https://probe.invalid/api/deploy.json");
+  const plain = await verify({
+    name: "deploy-verify-probe",
+    template_sha: "a".repeat(40),
+    url: "http://probe.invalid",
+  });
+  expect(plain.code).toBe(1);
+  expect(plain.stderr).toContain("url must be the app's https address");
+  // No stamp, a path-like name (with or without a url), a malformed template_sha and the template's own unstamped checkout all need
   // DEPLOY_URL. The template stamp is written out, not read from .mk/app.json: in a synced app that file is the
   // app's stamped one.
   for (const stamp of [
     undefined,
     { name: "../elsewhere", template_sha: "a".repeat(40) },
     { name: "deploy-verify-probe", template_sha: "oops" },
+    { name: "../elsewhere", template_sha: "a".repeat(40), url: "https://probe.invalid" },
     { template: "mauricekleine/app-template", template_sha: null, target: "soliton", name: "app-template" },
   ]) {
     const unnamed = await verify(stamp);
