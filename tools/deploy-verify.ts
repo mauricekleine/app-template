@@ -10,14 +10,18 @@ async function deployUrl() {
   const stamp = (await file.exists())
     ? ((await file.json()) as { name?: unknown; template_sha?: unknown; url?: unknown })
     : {};
-  const stamped = typeof stamp.template_sha === "string" && /^[0-9a-f]{40}$/.test(stamp.template_sha);
-  if (stamped && stamp.url !== undefined) {
+  if (
+    typeof stamp.template_sha !== "string" ||
+    !/^[0-9a-f]{40}$/.test(stamp.template_sha) ||
+    typeof stamp.name !== "string" ||
+    !/^[a-z0-9][a-z0-9-]*$/.test(stamp.name)
+  )
+    throw new Error("set DEPLOY_URL, or run from a stamped app checkout whose .mk/app.json names the app");
+  if (stamp.url !== undefined) {
     if (typeof stamp.url !== "string" || !stamp.url.startsWith("https://"))
       throw new Error(".mk/app.json url must be the app's https address");
     return stamp.url;
   }
-  if (!stamped || typeof stamp.name !== "string" || !/^[a-z0-9][a-z0-9-]*$/.test(stamp.name))
-    throw new Error("set DEPLOY_URL, or run from a stamped app checkout whose .mk/app.json names the app");
   return `https://${stamp.name}.mauricekleine.com`;
 }
 
