@@ -1,12 +1,13 @@
 import { expect, test } from "bun:test";
-import { chmod, copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { chmod, copyFile, mkdir, mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 // Runs a copy of the deploy command in a scratch app. A fake pinned cf is always on PATH, as `bun run` puts
 // node_modules/.bin there; `wrapper` also installs a fake login wrapper in ~/.local/bin, as on Maurice's hosts.
 async function deploy(target: string, wrapper: boolean) {
-  const dir = await mkdtemp(join(tmpdir(), "cloudflare-deploy-"));
+  // realpath: macOS reports the temporary directory under /private, as cf sees it in $PWD.
+  const dir = await realpath(await mkdtemp(join(tmpdir(), "cloudflare-deploy-")));
   try {
     const app = join(dir, "app");
     const calls = join(dir, "calls");
