@@ -4,7 +4,7 @@ A running TanStack Start app for Maurice's fleet. Bun, React, Tailwind and super
 
 ## Run it
 
-Use Bun 1.4.4. Tooling that needs Node uses 24.22.1 (`.node-version`).
+Use Bun 1.4.4. Tooling that needs Node uses 26.13.0 (`.node-version`).
 
 ```sh
 bun install --frozen-lockfile
