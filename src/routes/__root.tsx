@@ -1,6 +1,6 @@
 import { createRootRoute, HeadContent, Link, Outlet, Scripts } from "@tanstack/react-router";
-import { useState } from "react";
 import { app } from "../app";
+import { themeScript } from "@/components/superthread/lib/theme";
 import { Button } from "@/components/superthread/ui/button";
 import { FleetRail } from "@/components/superthread/ui/fleet-rail";
 import appCss from "../styles.css?url";
@@ -24,12 +24,18 @@ export const Route = createRootRoute({
 });
 
 function Document() {
-  const [paper, setPaper] = useState(false);
   return (
-    <html lang="en" className={paper ? "light" : "dark"}>
+    // themeScript sets the mode on <html> and the colour on the tag before it, ahead of hydration
+    <html lang="en" suppressHydrationWarning>
       <head>
-        <meta name="theme-color" content={paper ? __PAPER_COLOR__ : __VOID_COLOR__} />
-        <meta name="color-scheme" content={paper ? "light" : "dark"} />
+        <meta
+          name="theme-color"
+          content={__PAPER_COLOR__}
+          data-light={__PAPER_COLOR__}
+          data-dark={__VOID_COLOR__}
+          suppressHydrationWarning
+        />
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <HeadContent />
       </head>
       <body>
@@ -43,9 +49,6 @@ function Document() {
                 <img src={app.mark} width={32} height={32} alt="" />
                 {app.name}
               </Link>
-              <Button variant="outline" size="sm" aria-pressed={paper} onClick={() => setPaper(!paper)}>
-                paper mode
-              </Button>
             </header>
             <Outlet />
             <footer className="page-footer">
