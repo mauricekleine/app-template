@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from "react";
-// @mk/theme 2.3.0
+// @mk/theme 2.3.1
 
 // One mode across the fleet. The choice lives in a cookie on mauricekleine.com, so every ship reads the same one, with
 // a localStorage copy in case the browser expires the cookie early. themeScript runs in <head>, before the first paint,

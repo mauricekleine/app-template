@@ -93,4 +93,4 @@ export const home = {
 
 export type Ship = (typeof fleet)[number]
 export type ShipId = Ship["id"]
-// @mk/fleet 2.3.0
+// @mk/fleet 2.3.1
