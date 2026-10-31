@@ -14,13 +14,13 @@ bun run test                        # HTTP tests against the built Soliton app
 PORT=3000 bun run start              # production Soliton server
 ```
 
-The first page and the unknown-route page are real Start renders. Void is the initial mode on every full load; the paper-mode control switches the current document, including browser chrome. There is no saved preference or theme hydration script. No TanStack devtools ship in the app.
+The first page and the unknown-route page are real Start renders. The mode comes from `@mk/theme`: its inline script sets it before the first paint, including browser chrome, and the fleet rail's mode cell changes it. One choice covers the whole fleet, following the system until someone picks. No TanStack devtools ship in the app.
 
 `src/app.ts`, `public/mark.svg`, `src/routes/`, `src/page.css`, PRODUCT.md and DESIGN.md are the starting places for app-specific work. The neutral square-plus mark is a placeholder: `mk apps create` will replace `public/mark.svg` and the identity in `src/app.ts`. The masthead and favicon use that same mark. Fill in the product and design stubs before growing the example page.
 
 ## Superthread
 
-`components.json` maps `@mk` directly to the immutable `2.2.0` snapshot at `https://superthread.mauricekleine.com/r/v/2.2.0/{name}.json`. The installed tokens, fleet rail, button and badge (including their dependency closure) came from that snapshot through shadcn 4.22.1. Their source and retained version stamps live under `src/components/superthread/`. The app imports the installed CSS; it does not reproduce the theme.
+`components.json` maps `@mk` directly to the immutable `2.3.0` snapshot at `https://superthread.mauricekleine.com/r/v/2.3.0/{name}.json`. The installed tokens, fleet rail, button and badge (including their dependency closure) came from that snapshot through shadcn 4.22.1. Their source and retained version stamps live under `src/components/superthread/`. The app imports the installed CSS; it does not reproduce the theme.
 
 ```sh
 bun --bun shadcn add @mk/button --yes --overwrite
@@ -30,7 +30,7 @@ bun run registry:install --snapshot  # reinstall the manifest snapshot
 
 The install helper selects the live mapping by default, or the manifest snapshot with `--snapshot`. It reinstalls `template.json`'s items, restores the snapshot mapping and existing dependency pins, and retains new registry dependencies. It then refreshes the lock. The scheduled canary runs this in a disposable checkout; it does not commit or publish anything. After a successful canary, a template upgrade deliberately updates the snapshot, manifest and installed items together.
 
-The rail links each fleet ship to the public url in superthread's fleet data, and its home mark to superthread; soliton has no url and stays disabled. An app passes `hrefs` only to change a link: `"/"` for its own ship once it joins the fleet, `null` to unlink a cell. Fonts and rail marks come from the public superthread host. Unbounded and Fragment Mono load for everyone. Supreme and Erode are restricted to Maurice's origins and localhost; other origins use the theme's system fallbacks. See the [registry documentation](https://superthread.mauricekleine.com/install).
+The rail links each fleet ship to the public url in superthread's fleet data, and its home mark to superthread. An app passes `hrefs` only to change a link: `"/"` for its own ship once it joins the fleet, `null` to unlink a cell. Fonts and rail marks come from the public superthread host. Unbounded and Fragment Mono load for everyone. Supreme and Erode are restricted to Maurice's origins and localhost; other origins use the theme's system fallbacks. See the [registry documentation](https://superthread.mauricekleine.com/install).
 
 ## Two targets
 
@@ -58,7 +58,7 @@ A static page has no server to send headers, so its content security policy trav
 {
   "sha": "<40-character build commit>",
   "framework": "tanstack-start",
-  "superthread_version": "2.2.0",
+  "superthread_version": "2.3.0",
   "template_version": "1.0.0",
   "target": "soliton"
 }

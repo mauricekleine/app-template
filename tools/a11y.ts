@@ -23,14 +23,13 @@ try {
     });
     await page.goto(app.url);
     await page.evaluate(() => document.fonts.ready);
-    for (const mode of ["void", "paper"]) {
-      if (mode === "paper") {
-        const control = page.getByRole("button", { name: "paper mode" });
+    for (const mode of ["light", "dark"]) {
+      if (mode === "dark") {
+        const control = page.getByRole("button", { name: "dark mode" });
         await control.click();
-        // Audit the settled mode, after the control's token-driven colour transition.
-        await control.evaluate((element) =>
-          Promise.all(element.getAnimations().map((animation) => animation.finished)),
-        );
+        // Audit the settled mode: the pointer leaves, so the cell's tab closes, and every transition has finished.
+        await page.mouse.move(0, 0);
+        await page.evaluate(() => Promise.all(document.getAnimations().map((animation) => animation.finished)));
       }
       const result = await new AxeBuilder({ page }).analyze();
       const findings = [

@@ -41,7 +41,7 @@ function Home() {
         </div>
         <div className="starting-row">
           <h3>one shared frame</h3>
-          <p>type, controls and the fleet rail come from superthread. try paper mode above.</p>
+          <p>type, controls and the fleet rail come from superthread. try the mode toggle at the end of the rail.</p>
         </div>
         <div className="starting-row">
           <h3>two places to run</h3>
