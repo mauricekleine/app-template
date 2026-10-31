@@ -20,7 +20,7 @@ The first page and the unknown-route page are real Start renders. The mode comes
 
 ## Superthread
 
-`components.json` maps `@mk` directly to the immutable `2.3.0` snapshot at `https://superthread.mauricekleine.com/r/v/2.3.0/{name}.json`. The installed tokens, fleet rail, button and badge (including their dependency closure) came from that snapshot through shadcn 4.22.1. Their source and retained version stamps live under `src/components/superthread/`. The app imports the installed CSS; it does not reproduce the theme.
+`components.json` maps `@mk` directly to the immutable `2.3.1` snapshot at `https://superthread.mauricekleine.com/r/v/2.3.1/{name}.json`. The installed tokens, fleet rail, button and badge (including their dependency closure) came from that snapshot through shadcn 4.22.1. Their source and retained version stamps live under `src/components/superthread/`. The app imports the installed CSS; it does not reproduce the theme.
 
 ```sh
 bun --bun shadcn add @mk/button --yes --overwrite
@@ -58,7 +58,7 @@ A static page has no server to send headers, so its content security policy trav
 {
   "sha": "<40-character build commit>",
   "framework": "tanstack-start",
-  "superthread_version": "2.3.0",
+  "superthread_version": "2.3.1",
   "template_version": "1.0.0",
   "target": "soliton"
 }
