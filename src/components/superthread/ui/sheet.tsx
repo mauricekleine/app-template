@@ -4,7 +4,7 @@ import { cn } from "@/components/superthread/lib/utils"
 
 import { Button } from "@/components/superthread/ui/button"
 import { Icon } from "@/components/superthread/ui/glyphs"
-// @mk/sheet 2.3.1
+// @mk/sheet 2.4.0
 
 function Sheet({ ...props }: SheetPrimitive.Root.Props) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />
@@ -104,7 +104,7 @@ function SheetTitle({ className, ...props }: SheetPrimitive.Title.Props) {
     <SheetPrimitive.Title
       data-slot="sheet-title"
       className={cn(
-        "font-display text-base font-medium text-foreground",
+        "font-display text-first text-base font-medium",
         className
       )}
       {...props}
