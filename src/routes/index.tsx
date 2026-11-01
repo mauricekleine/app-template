@@ -25,7 +25,9 @@ function Home() {
           >
             make it yours <Icon name="arrow" />
           </Button>
-          <a href="https://superthread.mauricekleine.com/components/button">explore the components</a>
+          <a href="https://superthread.mauricekleine.com/components/button" className="link-quiet">
+            explore the components
+          </a>
         </div>
       </section>
       <section className="starting" aria-labelledby="starting-title">

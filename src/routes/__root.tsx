@@ -39,13 +39,10 @@ function Document() {
         <HeadContent />
       </head>
       <body>
-        <a href="#main" className="skip-link">
-          skip to content
-        </a>
         <FleetRail current="app-template">
           <div className="ship-panel">
             <header className="masthead">
-              <Link to="/" className="ship-name">
+              <Link to="/" className="ship-name relative [@media(max-width:600px)]:hit-area">
                 <img src={app.mark} width={32} height={32} alt="" />
                 {app.name}
               </Link>
@@ -53,7 +50,9 @@ function Document() {
             <Outlet />
             <footer className="page-footer">
               <span>part of maurice's fleet</span>
-              <a href="https://superthread.mauricekleine.com/install">built with superthread</a>
+              <a href="https://superthread.mauricekleine.com/install" className="link-quiet">
+                built with superthread
+              </a>
             </footer>
           </div>
         </FleetRail>

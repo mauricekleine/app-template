@@ -37,13 +37,14 @@ Work in create's bootstrap worktree. Keep every owned file as the template has i
 - **Components.** Replace hand-copied components with `@mk` items (`bunx --bun shadcn@latest add @mk/<item>`), and model each page on the gallery's mock ship pages. `shadcn add` loosens the owned `~` pins in `package.json` to `^`: restore the file and re-apply only the app's own changes (name, dependencies, scripts).
 - **Checking installed items.** The shadcn CLI drops an item's leading comment lines on install (`lib/fleet.ts`, `ui/glyphs.tsx`). Compare installed files with the registry's JSON ignoring those lines; everything else matches byte for byte.
 - **A Vite SPA.** An app outside Start puts the mode script first in `index.html`'s `<head>` and keeps its own `components.json` beside its sources (orbit's `web/`).
-- **App CSS.** Put element defaults (`html`, `body`, `a`) in `@layer base`, so item utilities win. Scope link colour to the working panel: an unlayered `a { color }` turns the ship nav plum and fails contrast. Keep `src/page.css` to layout; values come from the tokens.
-- **Landmarks.** `@mk/app-shell` 2.0.0 prints the ship's name outside every landmark. Until the item fixes it, pass `role="banner"` to `AppShellNav`.
+- **App CSS.** Keep `src/page.css` to layout; values come from the tokens. The tokens' base layer owns `html`'s ground, the body, selection, scrollbar, caret, focus ring and the working panel's links, so delete the app's copies: an unlayered rule outranks every item and utility. Put any element default that stays in `@layer base`.
+- **Panel.** The working panel is 880 px on every page, with no wide setting. Delete an app's wider panel and any `.wide` class.
+- **Skip link.** The fleet rail brings it, so delete an app's own anchor and its css. It lands on `#main`.
 - **Hydration.** Compute dates from a day string the server passes in, in UTC, and format times with a fixed `timeZone`. Server and client then render the same markup.
-- **Tables.** At the 1120 px panel, let long text cells wrap (`whitespace-normal`) so the last column stays visible. Below 600 px, show the same rows as list rows.
+- **Tables.** At the 880 px panel, let long text cells wrap (`whitespace-normal`) so the last column stays visible. Below 600 px, show the same rows as list rows.
 - **State files.** When a job rewrites a file the server reads on every request, write a file beside it and rename it into place, and read it with one `readFile`. Overwriting in place, or `Bun.file()` after a rename, hands a reader half a file.
 - **Ignored data.** `.gitignore` is owned. Keep local state out of Git with a `.gitignore` inside the data directory.
-- **Owned tests.** `test/serve.test.ts` and `tools/a11y.ts` expect an `h1` and the fleet rail on `/`, a button named "paper mode", and a 404 page with a link named "back to the start".
+- **Owned tests.** `test/serve.test.ts` and `tools/a11y.ts` expect an `h1` and the fleet rail on `/`, a button named "dark mode", and a 404 page with a link named "back to the start".
 - **Headings.** Keep buttons out of headings: a button inside an `h2` joins the heading's accessible name. happy-dom doesn't compute that, so check headings in an agent-browser snapshot.
 
 ### SQLite data
