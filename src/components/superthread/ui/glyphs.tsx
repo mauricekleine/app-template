@@ -1,7 +1,7 @@
-import type { AriaAttributes } from "react"
+import type { AriaAttributes, ReactNode } from "react"
 
 import { cn } from "@/components/superthread/lib/utils"
-// @mk/glyphs 2.4.0
+// @mk/glyphs 2.10.3
 
 // Every pixel icon (12 cells) and status glyph (14 cells) in tokens/glyphs.json, as whole-pixel squares.
 const ICONS = {
@@ -15,6 +15,7 @@ const ICONS = {
   "trash": [12, "M4 1h4v1h-4zM1 2h10v1h-10zM2 4h8v1h-8zM2 5h1v1h-1zM4 5h1v1h-1zM7 5h1v1h-1zM9 5h1v1h-1zM2 6h1v1h-1zM4 6h1v1h-1zM7 6h1v1h-1zM9 6h1v1h-1zM2 7h1v1h-1zM4 7h1v1h-1zM7 7h1v1h-1zM9 7h1v1h-1zM2 8h1v1h-1zM4 8h1v1h-1zM7 8h1v1h-1zM9 8h1v1h-1zM2 9h8v1h-8z"],
   "plus": [12, "M5 2h2v1h-2zM5 3h2v1h-2zM5 4h2v1h-2zM1 5h10v1h-10zM1 6h10v1h-10zM5 7h2v1h-2zM5 8h2v1h-2zM5 9h2v1h-2z"],
   "more": [12, "M1 5h2v1h-2zM5 5h2v1h-2zM9 5h2v1h-2zM1 6h2v1h-2zM5 6h2v1h-2zM9 6h2v1h-2z"],
+  "brief": [12, "M2 1h8v1h-8zM2 2h1v1h-1zM9 2h1v1h-1zM2 3h1v1h-1zM9 3h1v1h-1zM2 4h1v1h-1zM4 4h4v1h-4zM9 4h1v1h-1zM2 5h1v1h-1zM9 5h1v1h-1zM2 6h1v1h-1zM4 6h4v1h-4zM9 6h1v1h-1zM2 7h1v1h-1zM9 7h1v1h-1zM2 8h1v1h-1zM9 8h1v1h-1zM2 9h1v1h-1zM9 9h1v1h-1zM2 10h8v1h-8z"],
   "tick": [14, "M11 3h2v1h-2zM10 4h2v1h-2zM9 5h2v1h-2zM2 6h2v1h-2zM8 6h2v1h-2zM3 7h2v1h-2zM7 7h2v1h-2zM4 8h4v1h-4zM5 9h2v1h-2z"],
   "i": [14, "M6 2h2v1h-2zM6 3h2v1h-2zM6 5h2v1h-2zM6 6h2v1h-2zM6 7h2v1h-2zM6 8h2v1h-2zM6 9h2v1h-2zM6 10h2v1h-2zM6 11h2v1h-2z"],
   "pause": [14, "M4 3h2v1h-2zM8 3h2v1h-2zM4 4h2v1h-2zM8 4h2v1h-2zM4 5h2v1h-2zM8 5h2v1h-2zM4 6h2v1h-2zM8 6h2v1h-2zM4 7h2v1h-2zM8 7h2v1h-2zM4 8h2v1h-2zM8 8h2v1h-2zM4 9h2v1h-2zM8 9h2v1h-2zM4 10h2v1h-2zM8 10h2v1h-2z"],
@@ -95,5 +96,37 @@ export function FieldErrorGlyph({ className, ...aria }: Aria) {
     >
       <path d={FIELD_ERROR} />
     </svg>
+  )
+}
+
+// A state as a word beside an 8 px square in the word's ink: filled and in foreground while it's on, empty and muted
+// while it's off. The word carries the meaning, so the square stays decorative. The word is the ship's own, and it names
+// the state when given none.
+const STATE = {
+  on: "M0 0h8v1h-8zM0 1h8v1h-8zM0 2h8v1h-8zM0 3h8v1h-8zM0 4h8v1h-8zM0 5h8v1h-8zM0 6h8v1h-8zM0 7h8v1h-8z",
+  off: "M0 0h8v1h-8zM0 1h1v1h-1zM7 1h1v1h-1zM0 2h1v1h-1zM7 2h1v1h-1zM0 3h1v1h-1zM7 3h1v1h-1zM0 4h1v1h-1zM7 4h1v1h-1zM0 5h1v1h-1zM7 5h1v1h-1zM0 6h1v1h-1zM7 6h1v1h-1zM0 7h8v1h-8z",
+} as const
+
+export function StateWord({ on = false, children, className }: { on?: boolean; children?: ReactNode; className?: string }) {
+  const state = on ? "on" : "off"
+  return (
+    <span
+      data-slot="state-word"
+      data-state={state}
+      className={cn("inline-flex items-center gap-2", on ? "text-foreground" : "text-muted-foreground", className)}
+    >
+      <svg
+        viewBox="0 0 8 8"
+        width={8}
+        height={8}
+        shapeRendering="crispEdges"
+        fill="currentColor"
+        className="shrink-0"
+        aria-hidden
+      >
+        <path d={STATE[state]} />
+      </svg>
+      {children ?? state}
+    </span>
   )
 }

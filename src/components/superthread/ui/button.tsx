@@ -2,9 +2,10 @@ import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/components/superthread/lib/utils";
 import { Icon } from "@/components/superthread/ui/glyphs";
-// @mk/button 2.4.0
+// @mk/button 2.10.3
 
-// Square, 1 px edges, one chromatic ink. The default fills with plum on paper; off-paper turns it into the outline in a
+// Square, 1 px edges, one chromatic ink, Supreme wherever it lands. A link keeps its size's height and drops the inline
+// padding, so its word lines up with the text beside it. The default fills with plum on paper; off-paper turns it into the outline in a
 // dark scope, where a plum fill prints pale pink. Destructive takes the same outline there, so the action that throws
 // work away never outranks the page's one job. Key keeps its fill: it takes the first ink and destructive's hover and
 // press, for an action that leaves the app. Hover and press come from the --*-hover and --*-press roles (light overprints key, dark
@@ -13,7 +14,7 @@ import { Icon } from "@/components/superthread/ui/glyphs";
 // texture-disabled screens its edge back to the half on ::before, which is why every button stays positioned. On a
 // phone every size keeps its box and takes the pointer through a 44 px hit area on ::after.
 const buttonVariants = cva(
-  "group/button relative inline-flex shrink-0 items-center justify-center border border-transparent font-medium whitespace-nowrap transition-[color,background-color,border-color] duration-(--duration-instant) ease-(--ease-brand) select-none disabled:pointer-events-none disabled:bg-faint disabled:text-disabled aria-invalid:border-error texture-disabled [&_svg]:pointer-events-none [&_svg]:shrink-0 [@media(max-width:600px)]:hit-area",
+  "group/button relative inline-flex shrink-0 items-center justify-center border border-transparent font-sans font-medium whitespace-nowrap transition-[color,background-color,border-color] duration-(--duration-instant) ease-(--ease-brand) select-none disabled:pointer-events-none disabled:bg-faint disabled:text-disabled aria-invalid:border-error texture-disabled [&_svg]:pointer-events-none [&_svg]:shrink-0 [@media(max-width:600px)]:hit-area",
   {
     variants: {
       variant: {
@@ -39,6 +40,7 @@ const buttonVariants = cva(
         "icon-lg": "size-12",
       },
     },
+    compoundVariants: [{ variant: "link", className: "px-0" }],
     defaultVariants: {
       variant: "default",
       size: "default",
@@ -51,14 +53,19 @@ type ButtonSize = NonNullable<VariantProps<typeof buttonVariants>["size"]>;
 const iconSizes: ReadonlySet<ButtonSize> = new Set(["icon", "icon-xs", "icon-sm", "icon-lg"]);
 
 // Destructive prints in the first ink with the trash glyph and the word, so red stays a status colour. An icon button shows
-// one glyph: the trash, unless it is given its own.
+// one glyph: the trash, unless it is given its own. ignoreEnter stops Enter on keydown, before the app's own handler and
+// the click it would fire, so a key held from the last field can't send: Space is the keyboard path. It's for a button
+// that sends, which stays type="button": Enter in a field clicks a form's submit button with no keydown on the button.
+// A link keeps Enter, its only keyboard path.
 function Button({
   className,
   variant = "default",
   size = "default",
+  ignoreEnter,
+  onKeyDown,
   children,
   ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants> & { ignoreEnter?: boolean }) {
   const trash = <Icon name="trash" data-icon="inline-start" />;
   let content = children;
   if (variant === "destructive") {
@@ -76,7 +83,16 @@ function Button({
     <ButtonPrimitive
       data-slot="button"
       data-mk="button"
+      data-variant={variant}
       className={cn(buttonVariants({ variant, size, className }))}
+      onKeyDown={
+        ignoreEnter
+          ? (event) => {
+              if (event.key === "Enter") event.preventDefault();
+              onKeyDown?.(event);
+            }
+          : onKeyDown
+      }
       {...props}
     >
       {content}
