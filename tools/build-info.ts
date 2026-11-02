@@ -5,9 +5,9 @@ const root = new URL("../", import.meta.url);
 export const theme = readFileSync(new URL("src/components/superthread/styles/superthread.css", root), "utf8");
 
 export function buildInfo(target: "soliton" | "cloudflare") {
+  // A Workers Builds run without a commit (a deploy hook or a manual build) sets the branch name, not a SHA.
   const sha =
-    process.env.WORKERS_CI_COMMIT_SHA ||
-    process.env.GITHUB_SHA ||
+    [process.env.WORKERS_CI_COMMIT_SHA, process.env.GITHUB_SHA].find((value) => /^[0-9a-f]{40}$/.test(value ?? "")) ??
     execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, encoding: "utf8" }).trim();
   if (!/^[0-9a-f]{40}$/.test(sha)) throw new Error("build commit must be a full SHA");
   const superthread = theme.match(/@mk\/tokens ([^\s*]+)/)?.[1];

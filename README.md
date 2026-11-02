@@ -64,7 +64,7 @@ A static page has no server to send headers, so its content security policy trav
 }
 ```
 
-The SHA comes from `WORKERS_CI_COMMIT_SHA`, then `GITHUB_SHA`, then git HEAD. Registry version comes from the installed tokens' stamp; template version comes from `template.json`. The target records the actual build, and neither delivery endpoint is cached.
+The SHA comes from `WORKERS_CI_COMMIT_SHA`, then `GITHUB_SHA`, then git HEAD; a variable counts only when it holds a full 40-character SHA, since a Workers Builds run without a commit sets the branch name. Registry version comes from the installed tokens' stamp; template version comes from `template.json`. The target records the actual build, and neither delivery endpoint is cached.
 
 ```sh
 bun run deploy:verify <full-sha>
