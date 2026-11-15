@@ -7,6 +7,18 @@ const { default: start } = await import(entry);
 const assets = resolve(import.meta.dir, "../dist/client");
 const port = Number(process.env.PORT ?? 3000);
 
+// The mount answers only the names it is reached by: its fleet address, the stamp's url and loopback.
+// A foreign Host (a rebound DNS name) gets 421 before anything is served.
+const stamp = Bun.file(resolve(import.meta.dir, "../.mk/app.json"));
+const { name, url: stampedUrl } = (await stamp.exists())
+  ? ((await stamp.json()) as { name?: unknown; url?: unknown })
+  : {};
+const hosts = new Set(["127.0.0.1", "localhost", "[::1]"]);
+if (typeof name === "string" && /^[a-z0-9][a-z0-9-]*$/.test(name)) hosts.add(`${name}.mauricekleine.com`);
+if (typeof stampedUrl === "string" && URL.canParse(stampedUrl)) hosts.add(new URL(stampedUrl).hostname);
+const knownHost = (host: string | null) =>
+  host !== null && URL.canParse(`http://${host}`) && hosts.has(new URL(`http://${host}`).hostname);
+
 // Shutdown refuses new requests, waits for the ones in flight, then runs the app's hooks,
 // so a write the app acknowledged is always one its flush hook sees.
 let stopping = false;
@@ -19,6 +31,7 @@ const server = Bun.serve({
   async fetch(request, server) {
     if (stopping)
       return new Response("shutting down", { status: 503, headers: { connection: "close", "retry-after": "1" } });
+    if (!knownHost(request.headers.get("host"))) return new Response("unknown host", { status: 421 });
     const url = new URL(request.url);
     // Streams stay open until a hook closes them, so they never hold up the drain.
     if (url.pathname.startsWith("/api/streams/")) return handle(request, url, server);

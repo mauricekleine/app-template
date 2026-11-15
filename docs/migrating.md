@@ -71,7 +71,7 @@ The app repository owns its units in `infra/soliton/`:
 - `<name>.service`: `app.service` with the old port and the app's environment, such as its state directory or database file.
 - Each timer job: a oneshot service and its timer. The service runs from `~/.local/share/start-app/<name>/current` through a `run.sh` that resolves `.env.tpl` with `op run`. Secrets never touch a file.
 
-The vhost stays in soliton. Change it only if the app streams responses (`flush_interval -1`). A vhost change merges through the App; Maurice applies it with the attended Caddy install.
+The vhost stays in soliton. Change it only if the app streams responses (`flush_interval -1`). A vhost change merges through the App; Maurice applies it with the attended Caddy install. Behind the vhost the mount refuses only a foreign `Host` (421) and a cross-site browser write (403); a caller with no `Origin` or `Sec-Fetch-Site`, such as a script on the box, passes, so an app route that must not be called locally needs its own check.
 
 ## 4. Cut over
 
