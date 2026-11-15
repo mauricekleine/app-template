@@ -33,13 +33,20 @@ try {
   if (!Number.isSafeInteger(timeout) || timeout < 1) throw new Error("DEPLOY_VERIFY_TIMEOUT must be positive seconds");
   const deadline = Date.now() + timeout * 1000;
   let observed = "no response";
+  // A redirect means the address is wrong or behind a login, not that the deploy is pending, so it fails at once.
+  let redirect: string | undefined;
   do {
     try {
       url.searchParams.set("verify", String(Date.now()));
       const response = await fetch(url, {
         headers: { "cache-control": "no-cache" },
+        redirect: "manual",
         signal: AbortSignal.timeout(Math.min(10_000, Math.max(1, deadline - Date.now()))),
       });
+      if (response.status >= 300 && response.status < 400) {
+        redirect = `HTTP ${response.status} to ${response.headers.get("location") ?? "no location"}`;
+        break;
+      }
       if (response.ok) {
         const stamp = (await response.json()) as { sha?: string };
         if (stamp.sha === sha) {
@@ -54,6 +61,10 @@ try {
     if (Date.now() >= deadline) break;
     await Bun.sleep(Math.min(5_000, deadline - Date.now()));
   } while (Date.now() < deadline);
+  if (redirect)
+    throw new Error(
+      `${url.origin}${url.pathname} redirected (${redirect}); point DEPLOY_URL or the stamp's url at the address that serves the stamp`,
+    );
   throw new Error(`timed out after ${timeout}s waiting for ${url.origin}${url.pathname}; ${observed}`);
 } catch (error) {
   console.error(`deploy:verify: ${error instanceof Error ? error.message : String(error)}`);
