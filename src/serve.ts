@@ -46,6 +46,8 @@ async function handle(request: Request, url: URL, server: Bun.Server<undefined>)
     } catch {
       return new Response("bad path", { status: 400 });
     }
+    // A NUL byte decodes but no file can have it in its name.
+    if (pathname.includes("\0")) return new Response("bad path", { status: 400 });
     const filename = resolve(assets, `.${pathname}`);
     if (filename !== assets && !filename.startsWith(assets + sep)) return new Response("not found", { status: 404 });
     const file = Bun.file(filename);
