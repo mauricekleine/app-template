@@ -129,3 +129,29 @@ test("without DEPLOY_URL the verifier checks the app's own fleet address", async
     expect(unnamed.stderr).toContain("set DEPLOY_URL");
   }
 });
+
+test("a static path that decodes to a NUL byte or does not decode is a bad request", async () => {
+  for (const path of ["/%00", "/assets/x%00.js", "/%E0%A4%A"]) {
+    expect((await fetch(new URL(path, app.url))).status).toBe(400);
+  }
+});
+
+test("the deploy verifier fails on a redirect instead of following it", async () => {
+  const target = Bun.serve({
+    hostname: "127.0.0.1",
+    port: 0,
+    fetch: () => new Response(null, { status: 302, headers: { location: new URL("/api/deploy.json", app.url).href } }),
+  });
+  try {
+    const { sha } = (await (await fetch(new URL("/api/deploy.json", app.url))).json()) as { sha: string };
+    const child = Bun.spawn(["bun", "tools/deploy-verify.ts", sha], {
+      env: { ...process.env, DEPLOY_URL: target.url.href, DEPLOY_VERIFY_TIMEOUT: "1" },
+      stderr: "pipe",
+    });
+    const [stderr, code] = await Promise.all([new Response(child.stderr).text(), child.exited]);
+    expect(code).toBe(1);
+    expect(stderr).toContain("redirected (HTTP 302 to ");
+  } finally {
+    await target.stop(true);
+  }
+});
