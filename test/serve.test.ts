@@ -130,6 +130,39 @@ test("without DEPLOY_URL the verifier checks the app's own fleet address", async
   }
 });
 
+test("the mount answers only its fleet name and loopback, before serving anything", async () => {
+  const status = async (host: string, path = "/healthz") =>
+    (await fetch(new URL(path, app.url), { headers: { host } })).status;
+  // This test syncs into every app, so the fleet name comes from the stamp the mount itself reads.
+  const { name } = (await Bun.file(new URL("../.mk/app.json", import.meta.url)).json()) as { name: string };
+  const fleet = `${name}.mauricekleine.com`;
+  expect(await status(fleet)).toBe(200);
+  expect(await status(`${fleet.toUpperCase()}:443`)).toBe(200);
+  expect(await status(`localhost:${new URL(app.url).port}`)).toBe(200);
+  expect(await status("[::1]")).toBe(200);
+  expect(await status("evil.example")).toBe(421);
+  expect(await status("evil.example", "/mark.svg")).toBe(421);
+  expect(await status(`${fleet}.evil.example`)).toBe(421);
+  expect(await status("x:evil")).toBe(421);
+});
+
+test("a cross-site write is refused, a same-origin or header-less one reaches the app", async () => {
+  const post = async (headers: Record<string, string>) =>
+    (await fetch(new URL("/this-page-does-not-exist", app.url), { method: "POST", headers })).status;
+  const origin = new URL(app.url).origin;
+  expect(await post({ "sec-fetch-site": "cross-site", origin: "https://evil.example" })).toBe(403);
+  expect(await post({ "sec-fetch-site": "same-site", origin })).toBe(403);
+  expect(await post({ origin: "https://evil.example" })).toBe(403);
+  expect(await post({ origin: "null" })).toBe(403);
+  // Reached the app: Start answers the unknown path, not the policy.
+  expect(await post({ "sec-fetch-site": "same-origin", origin })).toBe(404);
+  expect(await post({ "sec-fetch-site": "none" })).toBe(404);
+  expect(await post({ origin })).toBe(404);
+  expect(await post({})).toBe(404);
+  // Reads never carry the check.
+  expect((await fetch(new URL("/healthz", app.url), { headers: { "sec-fetch-site": "cross-site" } })).status).toBe(200);
+});
+
 test("a static path that decodes to a NUL byte or does not decode is a bad request", async () => {
   for (const path of ["/%00", "/assets/x%00.js", "/%E0%A4%A"]) {
     expect((await fetch(new URL(path, app.url))).status).toBe(400);
