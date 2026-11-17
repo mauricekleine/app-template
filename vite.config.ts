@@ -7,6 +7,7 @@ import { defineConfig } from "vite";
 import { app } from "./src/app.ts";
 import { buildInfo, themeColor } from "./tools/build-info.ts";
 import { isStatic, staticSite } from "./tools/static-site.ts";
+import { touchIcon } from "./tools/touch-icon.ts";
 
 export default defineConfig(({ mode }) => {
   const stamp = buildInfo(mode === "cloudflare" ? "cloudflare" : "soliton");
@@ -34,6 +35,7 @@ export default defineConfig(({ mode }) => {
       ),
       react(),
       tailwindcss(),
+      touchIcon({ root: fileURLToPath(new URL(".", import.meta.url)), mark: app.mark }),
       ...(prerender ? [staticSite({ stamp, csp: (app as { csp?: string }).csp })] : []),
     ],
   };

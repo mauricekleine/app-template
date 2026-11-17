@@ -3,3 +3,6 @@
 
 /mark.svg
   Cache-Control: no-cache
+
+/apple-touch-icon.png
+  Cache-Control: no-cache
