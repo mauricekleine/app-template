@@ -147,18 +147,21 @@ test("the mount answers only its fleet name and loopback, before serving anythin
 });
 
 test("a cross-site write is refused, a same-origin or header-less one reaches the app", async () => {
-  const post = async (headers: Record<string, string>) =>
-    (await fetch(new URL("/this-page-does-not-exist", app.url), { method: "POST", headers })).status;
+  // This test syncs into every app, and each app answers an unknown POST its own way (404, 405…),
+  // so only the policy's own answer marks a refusal.
+  const refused = async (headers: Record<string, string>) => {
+    const res = await fetch(new URL("/this-page-does-not-exist", app.url), { method: "POST", headers });
+    return res.status === 403 && (await res.text()) === "cross-site request refused";
+  };
   const origin = new URL(app.url).origin;
-  expect(await post({ "sec-fetch-site": "cross-site", origin: "https://evil.example" })).toBe(403);
-  expect(await post({ "sec-fetch-site": "same-site", origin })).toBe(403);
-  expect(await post({ origin: "https://evil.example" })).toBe(403);
-  expect(await post({ origin: "null" })).toBe(403);
-  // Reached the app: Start answers the unknown path, not the policy.
-  expect(await post({ "sec-fetch-site": "same-origin", origin })).toBe(404);
-  expect(await post({ "sec-fetch-site": "none" })).toBe(404);
-  expect(await post({ origin })).toBe(404);
-  expect(await post({})).toBe(404);
+  expect(await refused({ "sec-fetch-site": "cross-site", origin: "https://evil.example" })).toBe(true);
+  expect(await refused({ "sec-fetch-site": "same-site", origin })).toBe(true);
+  expect(await refused({ origin: "https://evil.example" })).toBe(true);
+  expect(await refused({ origin: "null" })).toBe(true);
+  expect(await refused({ "sec-fetch-site": "same-origin", origin })).toBe(false);
+  expect(await refused({ "sec-fetch-site": "none" })).toBe(false);
+  expect(await refused({ origin })).toBe(false);
+  expect(await refused({})).toBe(false);
   // Reads never carry the check.
   expect((await fetch(new URL("/healthz", app.url), { headers: { "sec-fetch-site": "cross-site" } })).status).toBe(200);
 });
