@@ -19,11 +19,11 @@ test("the production mount serves health and a complete, uncached deployment sta
   const response = await fetch(new URL("/api/deploy.json", app.url));
   expect(response.headers.get("cache-control")).toBe("no-store");
   expect(await response.json()).toEqual({
-    sha: expect.stringMatching(/^[0-9a-f]{40}$/),
     framework: "tanstack-start",
+    sha: expect.stringMatching(/^[0-9a-f]{40}$/),
     superthread_version: expect.stringMatching(/^2\./),
-    template_version: "1.0.0",
     target: "soliton",
+    template_version: "1.0.0",
   });
 });
 
@@ -55,20 +55,32 @@ test("fingerprinted assets are immutable and public files revalidate", async () 
   expect((await fetch(new URL("/assets/missing-12345678.js", app.url))).status).toBe(404);
 });
 
+test("the home-screen icon is the mark as a 180px PNG, declared on every page", async () => {
+  expect(await (await fetch(app.url)).text()).toContain('<link rel="apple-touch-icon" href="/apple-touch-icon.png"');
+  const icon = await fetch(new URL("/apple-touch-icon.png", app.url));
+  expect(icon.status).toBe(200);
+  expect(icon.headers.get("content-type")).toContain("image/png");
+  const png = new DataView(await icon.arrayBuffer());
+  expect(png.getUint32(0)).toBe(0x89504e47);
+  expect([png.getUint32(16), png.getUint32(20)]).toEqual([180, 180]);
+});
+
 test("the deploy verifier accepts only the requested SHA and fails on a stale build", async () => {
-  const { sha } = (await (await fetch(new URL("/api/deploy.json", app.url))).json()) as { sha: string };
+  const { sha } = (await (await fetch(new URL("/api/deploy.json", app.url))).json()) as {
+    sha: string;
+  };
   const verify = async (expected: string) => {
     const child = Bun.spawn(["bun", "tools/deploy-verify.ts", expected], {
       env: { ...process.env, DEPLOY_URL: app.url, DEPLOY_VERIFY_TIMEOUT: "1" },
-      stdout: "pipe",
       stderr: "pipe",
+      stdout: "pipe",
     });
     const [stdout, stderr, code] = await Promise.all([
       new Response(child.stdout).text(),
       new Response(child.stderr).text(),
       child.exited,
     ]);
-    return { stdout, stderr, code };
+    return { code, stderr, stdout };
   };
   const accepted = await verify(sha);
   expect(accepted.code).toBe(0);
@@ -84,19 +96,25 @@ test("without DEPLOY_URL the verifier checks the app's own fleet address", async
   const verify = async (stamp?: object) => {
     const cwd = mkdtempSync(join(tmpdir(), "deploy-verify-"));
     try {
-      if (stamp) await Bun.write(join(cwd, ".mk/app.json"), JSON.stringify(stamp));
+      if (stamp) {
+        await Bun.write(join(cwd, ".mk/app.json"), JSON.stringify(stamp));
+      }
       const child = Bun.spawn(["bun", tool, "0".repeat(40)], {
         cwd,
         env: { ...env, DEPLOY_VERIFY_TIMEOUT: "1" },
         stderr: "pipe",
       });
       const [stderr, code] = await Promise.all([new Response(child.stderr).text(), child.exited]);
-      return { stderr, code };
+      return { code, stderr };
     } finally {
       rmSync(cwd, { force: true, recursive: true });
     }
   };
-  const named = await verify({ name: "deploy-verify-probe", template_sha: "a".repeat(40), target: "soliton" });
+  const named = await verify({
+    name: "deploy-verify-probe",
+    target: "soliton",
+    template_sha: "a".repeat(40),
+  });
   expect(named.code).toBe(1);
   expect(named.stderr).toContain("waiting for https://deploy-verify-probe.mauricekleine.com/api/deploy.json");
   // An app hosted elsewhere names its address in the stamp; only https counts.
@@ -122,7 +140,12 @@ test("without DEPLOY_URL the verifier checks the app's own fleet address", async
     { name: "../elsewhere", template_sha: "a".repeat(40) },
     { name: "deploy-verify-probe", template_sha: "oops" },
     { name: "../elsewhere", template_sha: "a".repeat(40), url: "https://probe.invalid" },
-    { template: "mauricekleine/app-template", template_sha: null, target: "soliton", name: "app-template" },
+    {
+      name: "app-template",
+      target: "soliton",
+      template: "mauricekleine/app-template",
+      template_sha: null,
+    },
   ]) {
     const unnamed = await verify(stamp);
     expect(unnamed.code).toBe(1);
@@ -134,7 +157,9 @@ test("the mount answers only its fleet name and loopback, before serving anythin
   const status = async (host: string, path = "/healthz") =>
     (await fetch(new URL(path, app.url), { headers: { host } })).status;
   // This test syncs into every app, so the fleet name comes from the stamp the mount itself reads.
-  const { name } = (await Bun.file(new URL("../.mk/app.json", import.meta.url)).json()) as { name: string };
+  const { name } = (await Bun.file(new URL("../.mk/app.json", import.meta.url)).json()) as {
+    name: string;
+  };
   const fleet = `${name}.mauricekleine.com`;
   expect(await status(fleet)).toBe(200);
   expect(await status(`${fleet.toUpperCase()}:443`)).toBe(200);
@@ -150,15 +175,18 @@ test("a cross-site write is refused, a same-origin or header-less one reaches th
   // This test syncs into every app, and each app answers an unknown POST its own way (404, 405…),
   // so only the policy's own answer marks a refusal.
   const refused = async (headers: Record<string, string>) => {
-    const res = await fetch(new URL("/this-page-does-not-exist", app.url), { method: "POST", headers });
+    const res = await fetch(new URL("/this-page-does-not-exist", app.url), {
+      headers,
+      method: "POST",
+    });
     return res.status === 403 && (await res.text()) === "cross-site request refused";
   };
   const origin = new URL(app.url).origin;
-  expect(await refused({ "sec-fetch-site": "cross-site", origin: "https://evil.example" })).toBe(true);
-  expect(await refused({ "sec-fetch-site": "same-site", origin })).toBe(true);
+  expect(await refused({ origin: "https://evil.example", "sec-fetch-site": "cross-site" })).toBe(true);
+  expect(await refused({ origin, "sec-fetch-site": "same-site" })).toBe(true);
   expect(await refused({ origin: "https://evil.example" })).toBe(true);
   expect(await refused({ origin: "null" })).toBe(true);
-  expect(await refused({ "sec-fetch-site": "same-origin", origin })).toBe(false);
+  expect(await refused({ origin, "sec-fetch-site": "same-origin" })).toBe(false);
   expect(await refused({ "sec-fetch-site": "none" })).toBe(false);
   expect(await refused({ origin })).toBe(false);
   expect(await refused({})).toBe(false);
@@ -174,12 +202,18 @@ test("a static path that decodes to a NUL byte or does not decode is a bad reque
 
 test("the deploy verifier fails on a redirect instead of following it", async () => {
   const target = Bun.serve({
+    fetch: () =>
+      new Response(null, {
+        status: 302,
+        headers: { location: new URL("/api/deploy.json", app.url).href },
+      }),
     hostname: "127.0.0.1",
     port: 0,
-    fetch: () => new Response(null, { status: 302, headers: { location: new URL("/api/deploy.json", app.url).href } }),
   });
   try {
-    const { sha } = (await (await fetch(new URL("/api/deploy.json", app.url))).json()) as { sha: string };
+    const { sha } = (await (await fetch(new URL("/api/deploy.json", app.url))).json()) as {
+      sha: string;
+    };
     const child = Bun.spawn(["bun", "tools/deploy-verify.ts", sha], {
       env: { ...process.env, DEPLOY_URL: target.url.href, DEPLOY_VERIFY_TIMEOUT: "1" },
       stderr: "pipe",

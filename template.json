@@ -50,6 +50,7 @@
     "tools/registry-install.ts",
     "tools/soliton-process.ts",
     "tools/static-site.ts",
+    "tools/touch-icon.ts",
     "tsconfig.json",
     "vite.config.ts"
   ],
@@ -82,6 +83,7 @@
       "/dependencies/tw-animate-css",
       "/devDependencies/@axe-core~1playwright",
       "/devDependencies/@cloudflare~1vite-plugin",
+      "/devDependencies/@resvg~1resvg-js",
       "/devDependencies/@types~1bun",
       "/devDependencies/@types~1node",
       "/devDependencies/@types~1react",

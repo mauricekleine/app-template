@@ -16,7 +16,7 @@ PORT=3000 bun run start              # production Soliton server
 
 The first page and the unknown-route page are real Start renders. The mode comes from `@mk/theme`: its inline script sets it before the first paint, including browser chrome, and the fleet rail's mode cell changes it. One choice covers the whole fleet, following the system until someone picks. No TanStack devtools ship in the app.
 
-`src/app.ts`, `public/mark.svg`, `src/routes/`, `src/page.css`, PRODUCT.md and DESIGN.md are the starting places for app-specific work. The neutral square-plus mark is a placeholder: `mk apps create` will replace `public/mark.svg` and the identity in `src/app.ts`. The masthead and favicon use that same mark. Fill in the product and design stubs before growing the example page.
+`src/app.ts`, `public/mark.svg`, `src/routes/`, `src/page.css`, PRODUCT.md and DESIGN.md are the starting places for app-specific work. The neutral square-plus mark is a placeholder: `mk apps create` will replace `public/mark.svg` and the identity in `src/app.ts`. The masthead, favicon and the build-rendered `/apple-touch-icon.png` use that same mark; the root document links the PNG, since iOS ignores SVG icons. Fill in the product and design stubs before growing the example page.
 
 ## Superthread
 

@@ -6,4 +6,4 @@ The starting page takes the fleet's mode from `@mk/theme`, and the fleet rail's 
 
 The working panel is at most 880 px wide on every page, so main content holds its place between pages. The rail brings the skip link, so each page's `main` holds `id="main"`. The tokens' base layer owns the window's ground, selection, scrollbar, caret and focus ring, so `src/page.css` writes none of them.
 
-`public/mark.svg` is a neutral placeholder. Replace it with the app's mark when creating a ship; the same file supplies the masthead and favicon. Fill in the app's purpose, density and route-specific composition here as the app grows.
+`public/mark.svg` is a neutral placeholder. Replace it with the app's mark when creating a ship; the same file supplies the masthead, the favicon and the 180px `apple-touch-icon.png` the build renders for iOS home screens. Fill in the app's purpose, density and route-specific composition here as the app grows.
