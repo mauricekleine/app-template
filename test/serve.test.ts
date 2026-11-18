@@ -172,24 +172,23 @@ test("the mount answers only its fleet name and loopback, before serving anythin
 });
 
 test("a cross-site write is refused, a same-origin or header-less one reaches the app", async () => {
-  // This test syncs into every app, and each app answers an unknown POST its own way (404, 405…),
-  // so only the policy's own answer marks a refusal.
-  const refused = async (headers: Record<string, string>) => {
-    const res = await fetch(new URL("/this-page-does-not-exist", app.url), {
-      headers,
-      method: "POST",
-    });
-    return res.status === 403 && (await res.text()) === "cross-site request refused";
+  // POST /healthz: the policy answers a refusal, and the template's own handler answers anything it lets
+  // through, whatever the app does with other paths.
+  const post = async (headers: Record<string, string>) => {
+    const res = await fetch(new URL("/healthz", app.url), { headers, method: "POST" });
+    return { body: await res.text(), status: res.status };
   };
+  const refused = { body: "cross-site request refused", status: 403 };
+  const reached = { body: JSON.stringify({ status: "ok" }), status: 200 };
   const origin = new URL(app.url).origin;
-  expect(await refused({ origin: "https://evil.example", "sec-fetch-site": "cross-site" })).toBe(true);
-  expect(await refused({ origin, "sec-fetch-site": "same-site" })).toBe(true);
-  expect(await refused({ origin: "https://evil.example" })).toBe(true);
-  expect(await refused({ origin: "null" })).toBe(true);
-  expect(await refused({ origin, "sec-fetch-site": "same-origin" })).toBe(false);
-  expect(await refused({ "sec-fetch-site": "none" })).toBe(false);
-  expect(await refused({ origin })).toBe(false);
-  expect(await refused({})).toBe(false);
+  expect(await post({ origin: "https://evil.example", "sec-fetch-site": "cross-site" })).toEqual(refused);
+  expect(await post({ origin, "sec-fetch-site": "same-site" })).toEqual(refused);
+  expect(await post({ origin: "https://evil.example" })).toEqual(refused);
+  expect(await post({ origin: "null" })).toEqual(refused);
+  expect(await post({ origin, "sec-fetch-site": "same-origin" })).toEqual(reached);
+  expect(await post({ "sec-fetch-site": "none" })).toEqual(reached);
+  expect(await post({ origin })).toEqual(reached);
+  expect(await post({})).toEqual(reached);
   // Reads never carry the check.
   expect((await fetch(new URL("/healthz", app.url), { headers: { "sec-fetch-site": "cross-site" } })).status).toBe(200);
 });
