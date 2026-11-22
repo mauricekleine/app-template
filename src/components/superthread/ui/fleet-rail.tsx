@@ -5,7 +5,7 @@ import { toggleTheme, useTheme } from "@/components/superthread/lib/theme";
 import { cn } from "@/components/superthread/lib/utils";
 import { Sidebar, SidebarProvider } from "@/components/superthread/ui/sidebar";
 import { TooltipProvider } from "@/components/superthread/ui/tooltip";
-// @mk/fleet-rail 2.10.3
+// @mk/fleet-rail 2.14.0
 
 const MARK_BASE = "https://superthread.mauricekleine.com/marks";
 

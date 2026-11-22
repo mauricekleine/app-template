@@ -2,7 +2,7 @@ import { Button as ButtonPrimitive } from "@base-ui/react/button";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/components/superthread/lib/utils";
 import { Icon } from "@/components/superthread/ui/glyphs";
-// @mk/button 2.10.3
+// @mk/button 2.14.0
 
 // Square, 1 px edges, one chromatic ink, Supreme wherever it lands. A link keeps its size's height and drops the inline
 // padding, so its word lines up with the text beside it. The default fills with plum on paper; off-paper turns it into the outline in a
