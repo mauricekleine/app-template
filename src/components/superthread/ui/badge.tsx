@@ -4,7 +4,7 @@ import { useRender } from "@base-ui/react/use-render";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/components/superthread/lib/utils";
 import { StatusGlyph, type StatusState } from "@/components/superthread/ui/glyphs";
-// @mk/badge 2.10.3
+// @mk/badge 2.14.0
 
 const STATES = ["done", "running", "waiting", "failed", "queued"] as const satisfies readonly StatusState[];
 
