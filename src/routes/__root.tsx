@@ -50,9 +50,9 @@ function Document() {
             </header>
             <Outlet />
             <footer className="page-footer">
-              <span>part of maurice's fleet</span>
+              <span>Part of Maurice's fleet</span>
               <a href="https://superthread.mauricekleine.com/install" className="link-quiet">
-                built with superthread
+                Built with superthread
               </a>
             </footer>
           </div>
@@ -66,10 +66,10 @@ function Document() {
 function NotFound() {
   return (
     <main id="main" className="page lost">
-      <h1 className="type-hero">nothing here.</h1>
-      <p className="intro">this address doesn't lead to a page. head back to the start.</p>
+      <h1 className="type-hero">Nothing here.</h1>
+      <p className="intro">This address doesn't lead to a page. Head back to the start.</p>
       <Button render={<Link to="/" />} nativeButton={false} role="link">
-        back to the start
+        Back to the start
       </Button>
       <p className="lost-code type-meta">404 / page not found</p>
     </main>

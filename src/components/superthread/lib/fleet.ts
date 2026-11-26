@@ -82,6 +82,18 @@ export const fleet = [
       "light": "soliton.svg",
       "dark": "soliton-dark.svg"
     }
+  },
+  {
+    "id": "hyperspeed",
+    "name": "hyperspeed",
+    "desc": "reviews pull requests",
+    "url": null,
+    "rail": false,
+    "angle": 1,
+    "mark": {
+      "light": "hyperspeed.svg",
+      "dark": "hyperspeed-dark.svg"
+    }
   }
 ] as const
 
@@ -93,4 +105,4 @@ export const home = {
 
 export type Ship = (typeof fleet)[number]
 export type ShipId = Ship["id"]
-// @mk/fleet 2.14.0
+// @mk/fleet 2.16.0

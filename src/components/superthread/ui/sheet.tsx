@@ -4,7 +4,7 @@ import { cn } from "@/components/superthread/lib/utils"
 
 import { Button } from "@/components/superthread/ui/button"
 import { Icon } from "@/components/superthread/ui/glyphs"
-// @mk/sheet 2.14.0
+// @mk/sheet 2.16.0
 
 function Sheet({ ...props }: SheetPrimitive.Root.Props) {
   return <SheetPrimitive.Root data-slot="sheet" {...props} />
@@ -71,7 +71,7 @@ function SheetContent({
             }
           >
             <Icon name="close" />
-            <span className="sr-only">close</span>
+            <span className="sr-only">Close</span>
           </SheetPrimitive.Close>
         )}
       </SheetPrimitive.Popup>
