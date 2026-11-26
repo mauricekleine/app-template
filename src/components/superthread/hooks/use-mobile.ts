@@ -1,5 +1,5 @@
 import * as React from "react"
-// @mk/use-mobile 2.14.0
+// @mk/use-mobile 2.16.0
 
 const MOBILE_BREAKPOINT = 768
 

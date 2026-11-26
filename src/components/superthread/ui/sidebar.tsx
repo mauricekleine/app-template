@@ -12,7 +12,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "
 import { Skeleton } from "@/components/superthread/ui/skeleton";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/superthread/ui/tooltip";
 import { Icon } from "@/components/superthread/ui/glyphs";
-// @mk/sidebar 2.14.0
+// @mk/sidebar 2.16.0
 
 const SIDEBAR_COOKIE_NAME = "sidebar_state";
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7;
@@ -188,8 +188,8 @@ function Sidebar({
           side={side}
         >
           <SheetHeader className="sr-only">
-            <SheetTitle>sidebar</SheetTitle>
-            <SheetDescription>displays the mobile sidebar.</SheetDescription>
+            <SheetTitle>Sidebar</SheetTitle>
+            <SheetDescription>Displays the mobile sidebar.</SheetDescription>
           </SheetHeader>
           <div className={cn("flex h-full w-full flex-col", ON_GROUND)}>{children}</div>
         </SheetContent>
@@ -263,7 +263,7 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
       {...props}
     >
       <Icon name="left" className="rtl:rotate-180" />
-      <span className="sr-only">toggle sidebar</span>
+      <span className="sr-only">Toggle sidebar</span>
     </Button>
   );
 }
@@ -275,10 +275,10 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
     <button
       data-sidebar="rail"
       data-slot="sidebar-rail"
-      aria-label="toggle sidebar"
+      aria-label="Toggle sidebar"
       tabIndex={-1}
       onClick={toggleSidebar}
-      title="toggle sidebar"
+      title="Toggle sidebar"
       className={cn(
         "absolute inset-y-0 z-20 hidden w-4 transition-[color,background-color,border-color] duration-(--duration-quick) ease-(--ease-brand) group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:start-1/2 after:w-[2px] hover:after:bg-sidebar-border sm:flex ltr:-translate-x-1/2 rtl:-translate-x-1/2",
         "in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize",

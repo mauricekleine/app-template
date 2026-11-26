@@ -1,7 +1,7 @@
 import type { AriaAttributes, ReactNode } from "react"
 
 import { cn } from "@/components/superthread/lib/utils"
-// @mk/glyphs 2.14.0
+// @mk/glyphs 2.16.0
 
 // Every pixel icon (12 cells) and status glyph (14 cells) in tokens/glyphs.json, as whole-pixel squares.
 const ICONS = {
@@ -126,7 +126,7 @@ export function StateWord({ on = false, children, className }: { on?: boolean; c
       >
         <path d={STATE[state]} />
       </svg>
-      {children ?? state}
+      {children ?? (on ? "On" : "Off")}
     </span>
   )
 }

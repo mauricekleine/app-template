@@ -5,7 +5,7 @@ import { toggleTheme, useTheme } from "@/components/superthread/lib/theme";
 import { cn } from "@/components/superthread/lib/utils";
 import { Sidebar, SidebarProvider } from "@/components/superthread/ui/sidebar";
 import { TooltipProvider } from "@/components/superthread/ui/tooltip";
-// @mk/fleet-rail 2.14.0
+// @mk/fleet-rail 2.16.0
 
 const MARK_BASE = "https://superthread.mauricekleine.com/marks";
 
@@ -78,7 +78,7 @@ export function FleetRail({
   children,
   hrefs = {},
   markBase = MARK_BASE,
-  label = "fleet",
+  label = "Fleet",
   skipLink = true,
   className,
 }: {
@@ -115,7 +115,7 @@ export function FleetRail({
       >
         {skipLink && (
           <a data-slot="fleet-rail-skip" href="#main" className={skip}>
-            skip to content
+            Skip to content
           </a>
         )}
         <div
@@ -200,7 +200,7 @@ export function FleetRail({
               <button
                 data-slot="fleet-rail-mode"
                 type="button"
-                aria-label="dark mode"
+                aria-label="Dark mode"
                 aria-describedby={`${uid}-mode`}
                 aria-pressed={theme === null ? undefined : theme === "dark"}
                 onClick={toggleTheme}
@@ -212,9 +212,9 @@ export function FleetRail({
               >
                 <ModeGlyph />
                 <span data-slot="fleet-rail-label" className={cn(tab, tabEnd)}>
-                  <span className={tabName}>dark mode</span>
+                  <span className={tabName}>Dark mode</span>
                   <span data-slot="fleet-rail-description" id={`${uid}-mode`} className={tabDesc}>
-                    across the whole fleet
+                    Across the whole fleet
                   </span>
                 </span>
               </button>
